@@ -14,6 +14,8 @@ import '../../../data/repositories/home_repository_impl.dart';
 import '../../../shared/widgets/place_bid_dialog.dart';
 import '../../home/controllers/home_controller.dart';
 import '../controllers/my_bid_controller.dart';
+import '../../../core/services/api_service.dart';
+import 'package:intl/intl.dart';
 
 class MyBidView extends StatelessWidget {
   const MyBidView({super.key});
@@ -65,6 +67,10 @@ class MyBidView extends StatelessWidget {
                 Expanded(
                   child: Obx(() {
                     final items = controller.currentTabItems;
+
+                    if (controller.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
                     if (items.isEmpty) {
                       return Center(
@@ -332,13 +338,13 @@ class MyBidView extends StatelessWidget {
                           Row(
                             children: [
                               Icon(
-                                Icons.gavel_rounded,
+                                Icons.timer_outlined,
                                 color: const Color(0xFF1B4E9F),
                                 size: 12.sp,
                               ),
                               SizedBox(width: 2.w),
                               Text(
-                                '${item.totalBids}',
+                                'Ends soon',
                                 style: GoogleFonts.outfit(
                                   color: const Color(0xFF1B4E9F),
                                   fontSize: 10.sp,
@@ -522,16 +528,30 @@ class MyBidView extends StatelessWidget {
                           Get.put(HomeController(Get.find<IHomeRepository>()));
                         }
                         final homeController = Get.find<HomeController>();
-                        final auctionItem = homeController.featuredAuctions.firstWhereOrNull((a) => a.id == item.id);
+                        final auctionItem = homeController.featuredAuctions.firstWhereOrNull((a) => a.id == item.id) ?? 
+                                            homeController.endingSoonAuctions.firstWhereOrNull((a) => a.id == item.id);
                         if (auctionItem != null) {
-                          PlaceBidDialog.show(context, auctionItem).then((newBidAmount) {
+                          PlaceBidDialog.show(context, auctionItem).then((newBidAmount) async {
                             if (newBidAmount != null) {
-                              homeController.placeBid(item.id, newBidAmount);
-                              controller.updateBid(item.id, newBidAmount);
+                              try {
+                                final response = await ApiService.post('/api/bids/', {
+                                  'sell_post': item.id,
+                                  'amount': newBidAmount,
+                                });
+                                if (response.statusCode == 201) {
+                                  final currencyFormat = NumberFormat.simpleCurrency(name: '\$', decimalDigits: 0);
+                                  SnackbarHelper.showSuccess('Bid of ${currencyFormat.format(newBidAmount)} placed successfully!');
+                                  controller.updateBid(item.id, newBidAmount);
+                                } else {
+                                  SnackbarHelper.showError('Failed to place bid.');
+                                }
+                              } catch (e) {
+                                SnackbarHelper.showError('Failed to place bid.');
+                              }
                             }
                           });
                         } else {
-                          SnackbarHelper.showError('Auction item details not found.');
+                          SnackbarHelper.showError('Auction item details not found in home feed.');
                         }
                       } else {
                         context.push(AppRoutes.auctionDetailsPath(item.id));

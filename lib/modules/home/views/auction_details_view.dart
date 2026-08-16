@@ -463,10 +463,15 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
           // Place Bid inside card
           GestureDetector(
             onTap: () {
-              PlaceBidDialog.show(context, item).then((bidAmount) {
+              PlaceBidDialog.show(context, item).then((bidAmount) async {
                 if (bidAmount != null) {
-                  // TODO: Call place bid API instead of mock
-                  // controller.placeBid(item.id, bidAmount);
+                  final success = await controller.placeBid(bidAmount);
+                  if (success) {
+                    final currencyFormat = NumberFormat.simpleCurrency(name: '\$', decimalDigits: 0);
+                    SnackbarHelper.showSuccess('Bid of ${currencyFormat.format(bidAmount)} placed successfully!');
+                  } else {
+                    SnackbarHelper.showError('Failed to place bid. Please try again.');
+                  }
                 }
               });
             },
@@ -1190,11 +1195,14 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                           child: const Text('Cancel'),
                         ),
                         TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.pop(context);
-                            // TODO: Call API instead of mock
-                            // controller.placeBid(item.id, item.buyNowPrice!);
-                            SnackbarHelper.showSuccess('Congratulations! You purchased the vehicle.');
+                            final success = await controller.placeBid(item.buyNowPrice!);
+                            if (success) {
+                              SnackbarHelper.showSuccess('Congratulations! You purchased the vehicle.');
+                            } else {
+                              SnackbarHelper.showError('Failed to process purchase. Please try again.');
+                            }
                           },
                           child: const Text('Buy Now'),
                         ),

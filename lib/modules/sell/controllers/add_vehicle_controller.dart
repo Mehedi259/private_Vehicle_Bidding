@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/utils/snackbar_helper.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../../core/services/api_service.dart';
 import '../controllers/sell_controller.dart';
 
 class AddVehicleController extends GetxController {
@@ -49,6 +52,12 @@ class AddVehicleController extends GetxController {
 
   // Expanded summary indices (Step 5)
   final RxList<bool> expandedSummaries = <bool>[false, false, false, false].obs;
+
+  // Verification Tokens
+  String? vinToken;
+  String? imageToken;
+  String? idToken;
+  final RxBool isVerifying = false.obs;
 
   void toggleSummary(int index) {
     if (index >= 0 && index < expandedSummaries.length) {
@@ -138,16 +147,65 @@ class AddVehicleController extends GetxController {
     selfieImagePath.value = null;
   }
 
-  void nextStep(BuildContext context) {
+  Future<void> nextStep(BuildContext context) async {
+    if (isVerifying.value) return;
+
     if (currentStep.value == 1) {
       if (validateStep1()) {
-        currentStep.value++;
+        isVerifying.value = true;
+        try {
+          final response = await ApiService.post('/api/sell/posts/verify-vin/', {
+            'vin_number': vinController.text.trim(),
+            'make': makeController.text.trim(),
+            'model': modelController.text.trim(),
+          });
+          if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            vinToken = data['verification_token'];
+            currentStep.value++;
+          } else {
+            final error = jsonDecode(response.body);
+            SnackbarHelper.showError(error['error'] ?? 'VIN Verification Failed');
+          }
+        } catch (e) {
+          SnackbarHelper.showError('Network error during verification');
+        } finally {
+          isVerifying.value = false;
+        }
       } else {
         SnackbarHelper.showError('Please fill all required fields marked with *');
       }
     } else if (currentStep.value == 2) {
       if (validateStep2()) {
-        currentStep.value++;
+        if (selectedImagePaths.isEmpty) {
+          SnackbarHelper.showError('Please select at least one image');
+          return;
+        }
+        isVerifying.value = true;
+        try {
+          final List<http.MultipartFile> files = [];
+          for (String path in selectedImagePaths) {
+            files.add(await http.MultipartFile.fromPath('uploaded_images', path));
+          }
+          final response = await ApiService.multipartRequest(
+            'POST',
+            '/api/sell/posts/verify-vehicle-image/',
+            files: files,
+          );
+          final resStr = await response.stream.bytesToString();
+          if (response.statusCode == 200) {
+            final data = jsonDecode(resStr);
+            imageToken = data['verification_token'];
+            currentStep.value++;
+          } else {
+            final error = jsonDecode(resStr);
+            SnackbarHelper.showError(error['error'] ?? 'Image Verification Failed');
+          }
+        } catch (e) {
+          SnackbarHelper.showError('Network error during verification');
+        } finally {
+          isVerifying.value = false;
+        }
       } else {
         SnackbarHelper.showError('Please enter a description for your vehicle');
       }
@@ -159,7 +217,33 @@ class AddVehicleController extends GetxController {
       }
     } else if (currentStep.value == 4) {
       if (validateStep4()) {
-        currentStep.value++;
+        if (selfieImagePath.value == null) {
+          SnackbarHelper.showError('Please capture or upload your ID document');
+          return;
+        }
+        isVerifying.value = true;
+        try {
+          final file = await http.MultipartFile.fromPath('government_id_image', selfieImagePath.value!);
+          final response = await ApiService.multipartRequest(
+            'POST',
+            '/api/sell/posts/verify-id-document/',
+            fields: {'id_type': selectedDocType.value == 'Driving License' ? 'license' : 'passport'},
+            files: [file],
+          );
+          final resStr = await response.stream.bytesToString();
+          if (response.statusCode == 200) {
+            final data = jsonDecode(resStr);
+            idToken = data['verification_token'];
+            currentStep.value++;
+          } else {
+            final error = jsonDecode(resStr);
+            SnackbarHelper.showError(error['error'] ?? 'ID Verification Failed');
+          }
+        } catch (e) {
+          SnackbarHelper.showError('Network error during verification');
+        } finally {
+          isVerifying.value = false;
+        }
       } else {
         SnackbarHelper.showError('Please fill all required verification fields marked with *');
       }
@@ -228,34 +312,61 @@ class AddVehicleController extends GetxController {
   }
 
   Future<void> submitForm(BuildContext context) async {
-    if (Get.isRegistered<SellController>()) {
-      final sellController = Get.find<SellController>();
+    isVerifying.value = true;
+    try {
       final title = '${yearController.value ?? ''} ${makeController.text.trim()} ${modelController.text.trim()}';
       final cleanedStarting = startingBidController.text.trim().replaceAll(',', '');
-      final startingBid = double.tryParse(cleanedStarting) ?? 18000.0;
       
       final cleanedBuyNow = buyNowPriceController.text.trim().replaceAll(',', '');
-      final buyNowPrice = cleanedBuyNow.isNotEmpty ? double.tryParse(cleanedBuyNow) : null;
+      final cleanedReserve = reservePriceController.text.trim().replaceAll(',', '');
 
-      final success = await sellController.addNewVehicle(
-        title,
-        startingBid,
-        customImage: selectedImagePaths.isNotEmpty ? selectedImagePaths.first : getDefaultImagePath(),
-        buyNowPrice: buyNowPrice,
+      final Map<String, String> fields = {
+        'title': title,
+        'make': makeController.text.trim(),
+        'model': modelController.text.trim(),
+        'year': yearController.value ?? '2026',
+        'mileage': mileageController.text.trim(),
+        'vin_number': vinController.text.trim(),
+        'transmission': transmissionController.text.trim(),
+        'fuel_type': fuelTypeController.text.trim(),
+        'description': descriptionController.text.trim(),
+        'vehicle_type': selectedCategory.value,
+        'starting_bid': cleanedStarting.isEmpty ? '18000' : cleanedStarting,
+      };
+
+      if (cleanedBuyNow.isNotEmpty) fields['buy_now_price'] = cleanedBuyNow;
+      if (cleanedReserve.isNotEmpty) fields['reserve_price'] = cleanedReserve;
+      if (vinToken != null) fields['vin_token'] = vinToken!;
+      if (imageToken != null) fields['image_token'] = imageToken!;
+      if (idToken != null) fields['id_token'] = idToken!;
+
+      final response = await ApiService.multipartRequest(
+        'POST',
+        '/api/sell/posts/',
+        fields: fields,
       );
 
-      if (success) {
+      if (response.statusCode == 201) {
+        if (Get.isRegistered<SellController>()) {
+          Get.find<SellController>().fetchListedVehicles();
+        }
         if (context.mounted) {
           Navigator.of(context).pop(); // Exit wizard
         }
         SnackbarHelper.showSuccess('Vehicle listed successfully!');
       } else {
-        SnackbarHelper.showError('Failed to list vehicle. Please try again.');
+        final resStr = await response.stream.bytesToString();
+        try {
+          final error = jsonDecode(resStr);
+          SnackbarHelper.showError(error['error'] ?? 'Failed to list vehicle. Please try again.');
+        } catch (e) {
+          SnackbarHelper.showError('Failed to list vehicle. Please try again.');
+        }
       }
-    } else {
-      if (context.mounted) {
-        Navigator.of(context).pop();
-      }
+    } catch (e) {
+      SnackbarHelper.showError('An error occurred during submission');
+    } finally {
+      isVerifying.value = false;
     }
   }
 

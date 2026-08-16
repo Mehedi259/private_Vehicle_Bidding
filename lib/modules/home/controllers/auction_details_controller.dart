@@ -51,4 +51,12 @@ class AuctionDetailsController extends GetxController {
     }
     return success;
   }
+
+  Future<bool> placeBid(double amount) async {
+    final success = await _repository.placeBid(itemId, amount);
+    if (success) {
+      await fetchDetails(); // Refresh details to show new bid
+    }
+    return success;
+  }
 }

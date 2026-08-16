@@ -65,9 +65,7 @@ class _PlaceBidDialogState extends State<PlaceBidDialog> {
       bidAmount = amount;
     }
 
-    final formattedAmount = NumberFormat.simpleCurrency(name: '\$', decimalDigits: 0).format(bidAmount);
     Navigator.of(context).pop(bidAmount);
-    SnackbarHelper.showSuccess('Bid of $formattedAmount placed successfully!');
   }
 
   @override

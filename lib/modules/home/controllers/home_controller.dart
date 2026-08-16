@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:get/get.dart';
 import '../../../core/interfaces/i_home_repository.dart';
+import '../../../core/services/api_service.dart';
 import '../../../data/models/auction_item.dart';
 import '../../../data/models/category_model.dart';
 import '../../../data/models/notification_model.dart';
@@ -74,25 +76,17 @@ class HomeController extends GetxController {
     _loadNotifications();
   }
 
-  void _loadNotifications() {
-    notifications.assignAll([
-      const NotificationModel(
-        id: 'n1',
-        title: '2023 Tesla Model Y',
-        message: 'You are the highest bidder',
-        vehicleId: '2',
-        type: NotificationType.success,
-        timeAgo: '',
-      ),
-      const NotificationModel(
-        id: 'n2',
-        title: '2021 Yamaha YZF-R1',
-        message: 'Your bid has been surpassed',
-        vehicleId: '4',
-        type: NotificationType.surpassed,
-        timeAgo: '',
-      ),
-    ]);
+  Future<void> _loadNotifications() async {
+    try {
+      final response = await ApiService.get('/api/notifications/');
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> results = data['results'] ?? [];
+        notifications.assignAll(results.map((json) => NotificationModel.fromJson(json)).toList());
+      }
+    } catch (e) {
+      Get.log("Error loading notifications: $e");
+    }
   }
 
   Future<void> fetchHomeData() async {
