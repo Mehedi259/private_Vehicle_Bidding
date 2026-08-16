@@ -10,6 +10,7 @@ class HomeController extends GetxController {
   HomeController(this._homeRepository);
 
   final RxList<AuctionItem> featuredAuctions = <AuctionItem>[].obs;
+  final RxList<AuctionItem> endingSoonAuctions = <AuctionItem>[].obs;
   final RxList<CategoryModel> categories = <CategoryModel>[].obs;
   final RxList<NotificationModel> notifications = <NotificationModel>[].obs;
   final RxBool isLoading = false.obs;
@@ -20,6 +21,14 @@ class HomeController extends GetxController {
 
   List<AuctionItem> get filteredAuctions {
     return featuredAuctions.where((item) {
+      final matchesCategory = selectedCategory.value == 'all' || item.category == selectedCategory.value;
+      final matchesSearch = searchQuery.value.isEmpty || item.title.toLowerCase().contains(searchQuery.value.toLowerCase());
+      return matchesCategory && matchesSearch;
+    }).toList();
+  }
+
+  List<AuctionItem> get filteredEndingSoonAuctions {
+    return endingSoonAuctions.where((item) {
       final matchesCategory = selectedCategory.value == 'all' || item.category == selectedCategory.value;
       final matchesSearch = searchQuery.value.isEmpty || item.title.toLowerCase().contains(searchQuery.value.toLowerCase());
       return matchesCategory && matchesSearch;
@@ -89,11 +98,15 @@ class HomeController extends GetxController {
   Future<void> fetchHomeData() async {
     isLoading.value = true;
     try {
-      final auctionsData = await _homeRepository.getFeaturedAuctions();
-      final categoriesData = await _homeRepository.getCategories();
-      
-      featuredAuctions.assignAll(auctionsData);
-      categories.assignAll(categoriesData);
+      final futures = await Future.wait([
+        _homeRepository.getFeaturedAuctions(),
+        _homeRepository.getEndingSoonAuctions(),
+        _homeRepository.getCategories(),
+      ]);
+
+      featuredAuctions.assignAll(futures[0] as List<AuctionItem>);
+      endingSoonAuctions.assignAll(futures[1] as List<AuctionItem>);
+      categories.assignAll(futures[2] as List<CategoryModel>);
     } catch (e) {
       Get.log("Error loading home data: $e");
     } finally {

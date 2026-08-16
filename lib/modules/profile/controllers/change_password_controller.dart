@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/utils/snackbar_helper.dart';
+import 'dart:convert';
+import '../../../core/services/api_service.dart';
 
 class ChangePasswordController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -16,14 +18,30 @@ class ChangePasswordController extends GetxController {
     if (formKey.currentState?.validate() ?? false) {
       isLoading.value = true;
 
-      // Simulate API call for password update
-      await Future.delayed(const Duration(milliseconds: 1000));
-      
-      isLoading.value = false;
+      try {
+        final response = await ApiService.post(
+          '/accounts/user/change-password/',
+          {
+            'current_password': currentPasswordController.text,
+            'new_password': newPasswordController.text,
+            'confirm_new_password': confirmPasswordController.text,
+          },
+          requireAuth: true,
+        );
 
-      if (context.mounted) {
-        SnackbarHelper.showSuccess('Password changed successfully.');
-        Navigator.of(context).pop(); // Go back to Security screen
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          if (context.mounted) {
+            SnackbarHelper.showSuccess('Password changed successfully.');
+            Navigator.of(context).pop(); // Go back to Security screen
+          }
+        } else {
+          final error = jsonDecode(response.body);
+          SnackbarHelper.showError(error['message'] ?? 'Failed to change password.');
+        }
+      } catch (e) {
+        SnackbarHelper.showError('Change password failed: ${e.toString()}');
+      } finally {
+        isLoading.value = false;
       }
     }
   }

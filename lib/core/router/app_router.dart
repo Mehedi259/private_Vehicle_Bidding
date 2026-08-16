@@ -65,7 +65,10 @@ class AppRouter {
       ),
       GoRoute(
         path: AppRoutes.resetPassword,
-        builder: (context, state) => const ResetPasswordView(),
+        builder: (context, state) {
+          final token = state.uri.queryParameters['token'] ?? '';
+          return ResetPasswordView(token: token);
+        },
       ),
       GoRoute(
         path: AppRoutes.resetSuccess,

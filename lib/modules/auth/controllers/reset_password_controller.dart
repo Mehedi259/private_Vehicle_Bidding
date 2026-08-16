@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_routes.dart';
+import '../../../../core/constants/app_routes.dart';
 import '../../../../core/utils/snackbar_helper.dart';
+import 'dart:convert';
+import '../../../../core/services/api_service.dart';
 
 class ResetPasswordController extends GetxController {
   // ─── Text Controllers ──────────────────────────────────────────────────────
@@ -14,6 +17,7 @@ class ResetPasswordController extends GetxController {
   final FocusNode confirmPasswordFocusNode = FocusNode();
 
   // ─── Observable State ─────────────────────────────────────────────────────
+  final RxString token = ''.obs;
   final RxBool isLoading = false.obs;
   final RxBool agreeToPrivacy = true.obs;
 
@@ -36,6 +40,11 @@ class ResetPasswordController extends GetxController {
     agreeToPrivacy.value = !agreeToPrivacy.value;
   }
 
+  /// Sets the reset token
+  void setToken(String t) {
+    token.value = t;
+  }
+
   /// Resets the user password
   Future<void> resetPassword(BuildContext context) async {
     if (formKey.currentState == null || !formKey.currentState!.validate()) {
@@ -49,12 +58,24 @@ class ResetPasswordController extends GetxController {
 
     isLoading.value = true;
     try {
-      // Mock network delay
-      await Future.delayed(const Duration(milliseconds: 1500));
+      final response = await ApiService.post(
+        '/accounts/user/set-new-password/',
+        {
+          'reset_token': token.value,
+          'new_password': passwordController.text,
+          'new_password2': confirmPasswordController.text,
+        },
+        requireAuth: false,
+      );
 
-      if (context.mounted) {
-        context.go(AppRoutes.resetSuccess);
-        SnackbarHelper.showSuccess('Password reset successfully! Please verify your login.');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (context.mounted) {
+          context.go(AppRoutes.resetSuccess);
+          SnackbarHelper.showSuccess('Password reset successfully! Please verify your login.');
+        }
+      } else {
+        final error = jsonDecode(response.body);
+        SnackbarHelper.showError(error['message'] ?? 'Failed to set new password.');
       }
     } catch (e) {
       SnackbarHelper.showError('Reset failed: ${e.toString()}');

@@ -3,6 +3,10 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/utils/snackbar_helper.dart';
+import 'dart:convert';
+import '../../../core/services/api_service.dart';
+import '../../../core/services/shared_prefs_service.dart';
+import 'profile_controller.dart';
 
 class SecurityController extends GetxController {
   // Observables for switch states
@@ -51,14 +55,30 @@ class SecurityController extends GetxController {
               onPressed: () async {
                 Navigator.of(dialogContext).pop();
                 isLoading.value = true;
-                
-                // Simulate network request
-                await Future.delayed(const Duration(milliseconds: 800));
-                isLoading.value = false;
+                try {
+                  final profileController = Get.find<ProfileController>();
+                  final email = profileController.user.value.email;
 
-                if (context.mounted) {
-                  context.go(AppRoutes.login);
-                  SnackbarHelper.showSuccess('Account deleted successfully.');
+                  final response = await ApiService.delete(
+                    '/accounts/user/delete-account/',
+                    {'email': email},
+                    requireAuth: true,
+                  );
+
+                  if (response.statusCode == 200 || response.statusCode == 204) {
+                    await SharedPrefsService.clearAuth();
+                    if (context.mounted) {
+                      context.go(AppRoutes.login);
+                      SnackbarHelper.showSuccess('Account deleted successfully.');
+                    }
+                  } else {
+                    final error = jsonDecode(response.body);
+                    SnackbarHelper.showError(error['message'] ?? 'Failed to delete account.');
+                  }
+                } catch (e) {
+                  SnackbarHelper.showError('Delete failed: ${e.toString()}');
+                } finally {
+                  isLoading.value = false;
                 }
               },
               child: const Text('Delete', style: TextStyle(color: Colors.red)),

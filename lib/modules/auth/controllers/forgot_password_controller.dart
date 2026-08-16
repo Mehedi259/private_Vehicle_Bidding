@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/utils/snackbar_helper.dart';
+import 'dart:convert';
+import '../../../../core/services/api_service.dart';
 
 class ForgotPasswordController extends GetxController {
   // ─── Text Controllers ──────────────────────────────────────────────────────
@@ -45,12 +47,20 @@ class ForgotPasswordController extends GetxController {
 
     isLoading.value = true;
     try {
-      // Mock network delay
-      await Future.delayed(const Duration(milliseconds: 1500));
+      final response = await ApiService.post(
+        '/accounts/user/send-reset-password-email/',
+        {'email': emailController.text.trim()},
+        requireAuth: false,
+      );
 
-      if (context.mounted) {
-        context.go('${AppRoutes.forgotPasswordVerification}?email=${Uri.encodeComponent(emailController.text)}');
-        SnackbarHelper.showSuccess('Instructions to reset your password have been sent to ${emailController.text}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (context.mounted) {
+          context.go('${AppRoutes.forgotPasswordVerification}?email=${Uri.encodeComponent(emailController.text)}');
+          SnackbarHelper.showSuccess('Instructions to reset your password have been sent to ${emailController.text}');
+        }
+      } else {
+        final error = jsonDecode(response.body);
+        SnackbarHelper.showError(error['message'] ?? 'Failed to send reset email.');
       }
     } catch (e) {
       SnackbarHelper.showError('Request failed: ${e.toString()}');

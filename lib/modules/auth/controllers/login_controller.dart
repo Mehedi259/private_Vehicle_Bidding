@@ -3,6 +3,9 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/utils/snackbar_helper.dart';
+import 'dart:convert';
+import '../../../../core/services/api_service.dart';
+import '../../../../core/services/shared_prefs_service.dart';
 
 class LoginController extends GetxController {
   // ─── Text Controllers ──────────────────────────────────────────────────────
@@ -44,13 +47,32 @@ class LoginController extends GetxController {
 
     isLoading.value = true;
     try {
-      // Mock network delay
-      await Future.delayed(const Duration(milliseconds: 1500));
-      
-      if (context.mounted) {
-        // Navigate to home after successful login
-        context.go(AppRoutes.home);
-        SnackbarHelper.showSuccess('Logged in successfully!');
+      final response = await ApiService.post(
+        '/accounts/user/login/',
+        {
+          'email': emailController.text.trim(),
+          'password': passwordController.text,
+        },
+        requireAuth: false,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        final access = data['token']['access'];
+        final refresh = data['token']['refresh'];
+
+        await SharedPrefsService.saveTokens(access: access, refresh: refresh);
+        
+        // Optionally save user info if it returns
+        // await SharedPrefsService.saveUser(email: emailController.text.trim());
+
+        if (context.mounted) {
+          context.go(AppRoutes.home);
+          SnackbarHelper.showSuccess('Logged in successfully!');
+        }
+      } else {
+        final error = jsonDecode(response.body);
+        SnackbarHelper.showError(error['message'] ?? 'Login failed. Invalid credentials.');
       }
     } catch (e) {
       SnackbarHelper.showError('Login failed: ${e.toString()}');

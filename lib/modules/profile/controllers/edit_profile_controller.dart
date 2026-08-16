@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-
 import '../../../core/utils/snackbar_helper.dart';
+import 'package:http/http.dart' as http;
+import '../../../core/services/api_service.dart';
 import 'profile_controller.dart';
 
 class EditProfileController extends GetxController {
@@ -116,26 +117,37 @@ class EditProfileController extends GetxController {
     isLoading.value = true;
 
     try {
-      // Mock network/db delay
-      await Future.delayed(const Duration(milliseconds: 1000));
+      final dobStr = dob.value != null ? DateFormat('dd-MM-yyyy').format(dob.value!) : null; // Backend might need specific format, assuming dd-MM-yyyy or similar
 
-      final current = _profileController.user.value;
-      final dobStr = dob.value != null ? DateFormat('dd/MM/yyyy').format(dob.value!) : null;
+      Map<String, String> fields = {
+        'name': nameController.text.trim(),
+        'email': emailController.text.trim(),
+      };
+      if (dobStr != null) fields['dob'] = dobStr;
+      if (gender.value.isNotEmpty) fields['gender'] = gender.value;
 
-      final updatedUser = current.copyWith(
-        name: nameController.text.trim(),
-        email: emailController.text.trim(),
-        dob: dobStr,
-        gender: gender.value,
-        avatarUrl: selectedImagePath.value.isNotEmpty ? selectedImagePath.value : current.avatarUrl,
+      List<http.MultipartFile> files = [];
+      if (selectedImagePath.value.isNotEmpty) {
+        files.add(await http.MultipartFile.fromPath('image', selectedImagePath.value));
+      }
+
+      final response = await ApiService.multipartRequest(
+        'PATCH',
+        '/accounts/user/profile/',
+        fields: fields,
+        files: files.isNotEmpty ? files : null,
       );
 
-      _profileController.user.value = updatedUser;
-      _profileController.update();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Fetch latest profile after update
+        await _profileController.fetchProfile();
 
-      if (context.mounted) {
-        Navigator.of(context).pop();
-        SnackbarHelper.showSuccess('Profile updated successfully!');
+        if (context.mounted) {
+          Navigator.of(context).pop();
+          SnackbarHelper.showSuccess('Profile updated successfully!');
+        }
+      } else {
+        SnackbarHelper.showError('Failed to update profile. Status: ${response.statusCode}');
       }
     } catch (e) {
       SnackbarHelper.showError('Failed to save profile: ${e.toString()}');

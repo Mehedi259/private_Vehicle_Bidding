@@ -1,0 +1,390 @@
+{
+	"info": {
+		"_postman_id": "c7cacd15-06f7-448e-8885-65c86d034ad4",
+		"name": "Vehicle Bidding",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44600470",
+		"_collection_link": "https://ferdoshossainkhurrom.postman.co/workspace/Ferdos-Hossain-Khurrom's-Worksp~d644082f-9fd5-42e6-80a7-2aa5fd562bd1/collection/44600470-c7cacd15-06f7-448e-8885-65c86d034ad4?action=share&source=collection_link&creator=44600470"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ferdos.khurrom@gmail.com\",\n    \"name\": \"khurrom\",\n    \"password\":123456,\n    \"password2\":123456\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Vebid}}accounts/user/register/",
+							"host": [
+								"{{Vebid}}accounts"
+							],
+							"path": [
+								"user",
+								"register",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Resend OTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ferdos.khurrom@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Vebid}}accounts/user/resend-otp/",
+							"host": [
+								"{{Vebid}}accounts"
+							],
+							"path": [
+								"user",
+								"resend-otp",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"ferdos.khurrom@gmail.com\",\n  \"otp\": \"505986\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{ai_bag}}accounts/user/verify-otp/",
+							"host": [
+								"{{ai_bag}}accounts"
+							],
+							"path": [
+								"user",
+								"verify-otp",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"bohivim457@muncloud.com\",\n    \"password\": \"AL_amin123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Vebid}}accounts/user/login/",
+							"host": [
+								"{{Vebid}}accounts"
+							],
+							"path": [
+								"user",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Access Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NjM0NjAyOSwiaWF0IjoxNzY2MjU5NjI5LCJqdGkiOiI0YTBlY2JlNmIwNTY0MGM2OWJhNjkwYWE3MGU3NTk2MiIsInVzZXJfaWQiOiIxMSJ9.wOCLKvrnSYM4TOoc0rjVJloBu04NXdJNlaWGCx1E-lM\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Vebid}}accounts/user/token/refresh/",
+							"host": [
+								"{{Vebid}}accounts"
+							],
+							"path": [
+								"user",
+								"token",
+								"refresh",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Token Verify",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNzYxMjk2LCJpYXQiOjE3NTM2NDEyOTYsImp0aSI6IjI3NjQ2NTc4Yjk0MTRkNTg5NjE4NDdiYmEwNGQ4NWQ1IiwidXNlcl9pZCI6Mn0.0yBaST3PQiuXw44jqkbA872B_ieeMN3fKliv8dZ7p4\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Vebid}}accounts/user/token/verify/",
+							"host": [
+								"{{Vebid}}accounts"
+							],
+							"path": [
+								"user",
+								"token",
+								"verify",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "postman-cloud:///1f12c7db-acfa-42e0-bdb6-853d20cd100b",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{Vebid}}accounts/user/profile/",
+							"host": [
+								"{{Vebid}}accounts"
+							],
+							"path": [
+								"user",
+								"profile",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "postman-cloud:///1f12c7db-acfa-42e0-bdb6-853d20cd100b"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{Vebid}}accounts/user/profile/",
+							"host": [
+								"{{Vebid}}accounts"
+							],
+							"path": [
+								"user",
+								"profile",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forget Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ferdos.khurrom@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Vebid}}accounts/user/send-reset-password-email/",
+							"host": [
+								"{{Vebid}}accounts"
+							],
+							"path": [
+								"user",
+								"send-reset-password-email",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"ferdos.khurrom@gmail.com\",\n  \"otp\": \"091169\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Vebid}}accounts/user/reset-password-otp/",
+							"host": [
+								"{{Vebid}}accounts"
+							],
+							"path": [
+								"user",
+								"reset-password-otp",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset New Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \n    \"reset_token\": \"6ca8ae30-1cd2-440d-a4cd-9f710decd837\", \n    \"new_password\": \"newpass1234\", \n    \"new_password2\": \"newpass1234\" \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Vebid}}accounts/user/set-new-password/",
+							"host": [
+								"{{Vebid}}accounts"
+							],
+							"path": [
+								"user",
+								"set-new-password",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"current_password\":\"newpass1234\",\n    \"new_password\":\"newpass12345\",\n    \"confirm_new_password\":\"newpass12345\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Vebid}}accounts/user/change-password/",
+							"host": [
+								"{{Vebid}}accounts"
+							],
+							"path": [
+								"user",
+								"change-password",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"ferdos.khurrom@gmail.com\"\n}"
+						},
+						"url": {
+							"raw": "{{Vebid}}accounts/user/delete-account/",
+							"host": [
+								"{{Vebid}}accounts"
+							],
+							"path": [
+								"user",
+								"delete-account",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "Vebid",
+			"value": "",
+			"type": "default"
+		}
+	]
+}

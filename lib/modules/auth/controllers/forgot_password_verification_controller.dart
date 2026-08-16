@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../../core/utils/snackbar_helper.dart';
+import 'dart:convert';
+import '../../../../core/services/api_service.dart';
 
 class ForgotPasswordVerificationController extends GetxController {
   // ─── OTP Text Controllers ──────────────────────────────────────────────────
@@ -86,12 +88,26 @@ class ForgotPasswordVerificationController extends GetxController {
 
     isLoading.value = true;
     try {
-      // Mock network verification delay
-      await Future.delayed(const Duration(milliseconds: 1500));
+      final response = await ApiService.post(
+        '/accounts/user/reset-password-otp/',
+        {
+          'email': email.value,
+          'otp': otp,
+        },
+        requireAuth: false,
+      );
 
-      if (context.mounted) {
-        context.go(AppRoutes.resetPassword);
-        SnackbarHelper.showSuccess('Email verified successfully! Please create your new password.');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        final resetToken = data['reset_token'] ?? ''; // assuming it returns 'reset_token'
+
+        if (context.mounted) {
+          context.go('${AppRoutes.resetPassword}?token=$resetToken');
+          SnackbarHelper.showSuccess('Email verified successfully! Please create your new password.');
+        }
+      } else {
+        final error = jsonDecode(response.body);
+        SnackbarHelper.showError(error['message'] ?? 'The code you entered is incorrect. Try again.');
       }
     } catch (e) {
       SnackbarHelper.showError('Verification failed: ${e.toString()}');

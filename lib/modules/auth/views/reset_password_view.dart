@@ -11,7 +11,8 @@ import '../../onboarding/widgets/onboarding_header.dart';
 import '../controllers/reset_password_controller.dart';
 
 class ResetPasswordView extends StatefulWidget {
-  const ResetPasswordView({super.key});
+  final String token;
+  const ResetPasswordView({super.key, required this.token});
 
   @override
   State<ResetPasswordView> createState() => _ResetPasswordViewState();
@@ -24,6 +25,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
   void initState() {
     super.initState();
     controller = Get.put(ResetPasswordController());
+    controller.setToken(widget.token);
   }
 
   @override

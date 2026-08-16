@@ -7,19 +7,51 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/utils/snackbar_helper.dart';
 import '../../../data/models/user_model.dart';
+import 'dart:convert';
+import '../../../core/services/api_service.dart';
+import '../../../core/services/shared_prefs_service.dart';
 
 class ProfileController extends GetxController {
   // Observable user state
   final Rx<UserModel> user = const UserModel(
-    id: 'u1',
-    name: 'Mohammad Shobuj',
-    email: 'mdshobuj204111@gmail.com',
-    avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150',
-    dob: '12/11/2001',
-    gender: 'Male',
+    id: '',
+    name: 'Loading...',
+    email: 'Loading...',
+    avatarUrl: '',
+    dob: '',
+    gender: '',
   ).obs;
 
   final RxBool isLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchProfile();
+  }
+
+  /// Fetch user profile from backend
+  Future<void> fetchProfile() async {
+    isLoading.value = true;
+    try {
+      final response = await ApiService.get('/accounts/user/profile/', requireAuth: true);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        user.value = UserModel(
+          id: data['id']?.toString() ?? '',
+          name: data['name'] ?? '',
+          email: data['email'] ?? '',
+          avatarUrl: data['image'] ?? '',
+          dob: data['dob'] ?? '',
+          gender: data['gender'] ?? '',
+        );
+      }
+    } catch (e) {
+      debugPrint('Failed to fetch profile: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
   /// Trigger edit profile flow
   void editProfile(BuildContext context) {
@@ -120,10 +152,13 @@ class ProfileController extends GetxController {
                     width: 234.w,
                     height: 41.h,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.of(dialogContext).pop();
-                        context.go(AppRoutes.login);
-                        SnackbarHelper.showSuccess('Logged out successfully!');
+                        await SharedPrefsService.clearAuth();
+                        if (context.mounted) {
+                          context.go(AppRoutes.login);
+                          SnackbarHelper.showSuccess('Logged out successfully!');
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1B4E9F),

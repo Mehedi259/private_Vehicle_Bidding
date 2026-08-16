@@ -203,6 +203,80 @@ class _HomeViewState extends State<HomeView> {
                     );
                   },
                 ),
+                SizedBox(height: 24.h),
+
+                // 7. Ending Soon Section
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Ending Soon',
+                        style: GoogleFonts.outfit(
+                          color: const Color(0xFF2A2A2A),
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    GestureDetector(
+                      onTap: () => context.push(AppRoutes.featuredAuctions), // Can be updated to ending soon route
+                      child: Text(
+                        'View all',
+                        style: GoogleFonts.outfit(
+                          color: const Color(0xFF1B4E9F),
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12.h),
+
+                // 8. Ending Soon Cards
+                Builder(
+                  builder: (context) {
+                    final items = controller.filteredEndingSoonAuctions.take(2).toList();
+                    if (items.isEmpty) {
+                      return Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(vertical: 24.h),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'No ending soon auctions found.',
+                          style: GoogleFonts.outfit(
+                            color: const Color(0x992A2A2A),
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      );
+                    }
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: items.map((item) {
+                        return FeaturedAuctionCard(
+                          item: item,
+                          onTap: () {
+                            context.push(AppRoutes.auctionDetailsPath(item.id));
+                          },
+                          onPlaceBidTap: () {
+                            PlaceBidDialog.show(context, item).then((bidAmount) {
+                              if (bidAmount != null) {
+                                controller.placeBid(item.id, bidAmount);
+                              }
+                            });
+                          },
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
 
                 // Spacing at the bottom to prevent navbar overlapping
                 SizedBox(height: 100.h),

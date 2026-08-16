@@ -8,8 +8,11 @@ import 'core/router/app_router.dart';
 import 'core/utils/page_transitions.dart';
 import 'core/utils/snackbar_helper.dart';
 
-void main() {
+import 'core/services/shared_prefs_service.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SharedPrefsService.init();
 
   runApp(
     DevicePreview(

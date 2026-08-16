@@ -9,25 +9,56 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../../core/utils/snackbar_helper.dart';
 import '../../../shared/widgets/place_bid_dialog.dart';
-import '../controllers/home_controller.dart';
+import '../../../core/interfaces/i_auction_details_repository.dart';
+import '../../../data/repositories/auction_details_repository_impl.dart';
+import '../controllers/auction_details_controller.dart';
 import '../../../data/models/auction_item.dart';
 import '../../../shared/widgets/app_back_button.dart';
 
-class AuctionDetailsView extends StatelessWidget {
+class AuctionDetailsView extends StatefulWidget {
   final String itemId;
 
   const AuctionDetailsView({super.key, required this.itemId});
 
   @override
+  State<AuctionDetailsView> createState() => _AuctionDetailsViewState();
+}
+
+class _AuctionDetailsViewState extends State<AuctionDetailsView> {
+  late final AuctionDetailsController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!Get.isRegistered<IAuctionDetailsRepository>()) {
+      Get.lazyPut<IAuctionDetailsRepository>(() => AuctionDetailsRepositoryImpl());
+    }
+    controller = Get.put(
+      AuctionDetailsController(Get.find<IAuctionDetailsRepository>(), widget.itemId),
+      tag: widget.itemId,
+    );
+  }
+
+  final TextEditingController _commentController = TextEditingController();
+
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = Get.find<HomeController>();
     final currencyFormat = NumberFormat.simpleCurrency(name: '\$', decimalDigits: 0);
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: Obx(() {
-        // Find the item dynamically in the reactive list.
-        final item = controller.featuredAuctions.firstWhereOrNull((i) => i.id == itemId);
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final item = controller.auctionItem.value;
 
         if (item == null) {
           return const Scaffold(
@@ -309,6 +340,10 @@ class AuctionDetailsView extends StatelessWidget {
 
                           // 10. Location Card
                           _buildLocationSection(),
+                          SizedBox(height: 24.h),
+
+                          // 11. Comments Section
+                          _buildCommentsSection(),
 
                           // Spacing at the bottom to avoid sticky bar overlapping
                           SizedBox(height: 120.h),
@@ -340,7 +375,7 @@ class AuctionDetailsView extends StatelessWidget {
     BuildContext context,
     AuctionItem item,
     NumberFormat currencyFormat,
-    HomeController controller,
+    AuctionDetailsController controller,
   ) {
     return Container(
       width: double.infinity,
@@ -430,7 +465,8 @@ class AuctionDetailsView extends StatelessWidget {
             onTap: () {
               PlaceBidDialog.show(context, item).then((bidAmount) {
                 if (bidAmount != null) {
-                  controller.placeBid(item.id, bidAmount);
+                  // TODO: Call place bid API instead of mock
+                  // controller.placeBid(item.id, bidAmount);
                 }
               });
             },
@@ -965,12 +1001,137 @@ class AuctionDetailsView extends StatelessWidget {
     );
   }
 
+  // Comments Section Builder
+  Widget _buildCommentsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Comments',
+          style: GoogleFonts.outfit(
+            color: const Color(0xFF2A2A2A),
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: 12.h),
+        // Add comment input
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _commentController,
+                decoration: InputDecoration(
+                  hintText: 'Write a comment...',
+                  hintStyle: GoogleFonts.outfit(color: Colors.grey),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24.r),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24.r),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24.r),
+                    borderSide: const BorderSide(color: Color(0xFF1B4E9F)),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 8.w),
+            GestureDetector(
+              onTap: () async {
+                final text = _commentController.text.trim();
+                if (text.isNotEmpty) {
+                  final success = await controller.postComment(text);
+                  if (success) {
+                    _commentController.clear();
+                    SnackbarHelper.showSuccess('Comment posted successfully');
+                  } else {
+                    SnackbarHelper.showError('Failed to post comment');
+                  }
+                }
+              },
+              child: Container(
+                padding: EdgeInsets.all(12.r),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF1B4E9F),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.send_rounded, color: Colors.white, size: 20.sp),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 16.h),
+        // Comments List
+        Obx(() {
+          if (controller.isCommentsLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (controller.comments.isEmpty) {
+            return Text(
+              'No comments yet.',
+              style: GoogleFonts.outfit(color: Colors.grey, fontSize: 14.sp),
+            );
+          }
+          return ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: controller.comments.length,
+            separatorBuilder: (context, index) => Divider(color: Colors.grey.shade200, height: 24.h),
+            itemBuilder: (context, index) {
+              final comment = controller.comments[index];
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16.r,
+                        backgroundColor: const Color(0xFFF1F5F9),
+                        child: Text(
+                          comment['user'] != null && comment['user']['name'] != null
+                              ? comment['user']['name'][0].toUpperCase()
+                              : 'U',
+                          style: GoogleFonts.outfit(color: const Color(0xFF1B4E9F), fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          comment['user'] != null ? comment['user']['name'] ?? 'User' : 'User',
+                          style: GoogleFonts.outfit(fontWeight: FontWeight.w600, fontSize: 14.sp),
+                        ),
+                      ),
+                      Text(
+                        'Just now', // Ideally formatted from comment['created_at']
+                        style: GoogleFonts.outfit(color: Colors.grey, fontSize: 12.sp),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    comment['text'] ?? '',
+                    style: GoogleFonts.outfit(fontSize: 14.sp, color: const Color(0xFF2A2A2A)),
+                  ),
+                ],
+              );
+            },
+          );
+        }),
+      ],
+    );
+  }
+
   // Bottom Sticky Bar builder
   Widget _buildStickyBottomBar(
     BuildContext context,
     AuctionItem item,
     NumberFormat currencyFormat,
-    HomeController controller,
+    AuctionDetailsController controller,
   ) {
     return Container(
       width: double.infinity,
@@ -1031,7 +1192,8 @@ class AuctionDetailsView extends StatelessWidget {
                         TextButton(
                           onPressed: () {
                             Navigator.pop(context);
-                            controller.placeBid(item.id, item.buyNowPrice!);
+                            // TODO: Call API instead of mock
+                            // controller.placeBid(item.id, item.buyNowPrice!);
                             SnackbarHelper.showSuccess('Congratulations! You purchased the vehicle.');
                           },
                           child: const Text('Buy Now'),

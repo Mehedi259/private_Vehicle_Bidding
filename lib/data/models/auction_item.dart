@@ -49,6 +49,36 @@ class AuctionItem {
     this.buyNowPrice,
   });
 
+  factory AuctionItem.fromJson(Map<String, dynamic> json) {
+    String primaryImage = '';
+    if (json['images'] != null && (json['images'] as List).isNotEmpty) {
+      final images = json['images'] as List;
+      final primary = images.firstWhere((img) => img['is_primary'] == true, orElse: () => images.first);
+      primaryImage = primary['image'] ?? '';
+    }
+
+    final seller = json['seller_details'] ?? {};
+
+    return AuctionItem(
+      id: json['id']?.toString() ?? '',
+      title: '${json['year']} ${json['make']} ${json['model']}',
+      imageUrl: primaryImage,
+      currentBid: double.tryParse(json['highest_bid_amount']?.toString() ?? '0') ?? 0.0,
+      bidsCount: json['total_bids_count'] ?? 0,
+      category: (json['vehicle_type']?.toString() ?? 'cars').toLowerCase(),
+      subtitle: '${json['make']} ${json['model']}',
+      mileage: '${json['mileage']} M',
+      transmission: json['transmission'] ?? '',
+      fuelType: json['fuel_type'] ?? '',
+      description: json['description'] ?? '',
+      verifiedSeller: seller['is_id_verified'] == true,
+      vinVerified: json['is_vin_verified'] == true,
+      features: [], // Might need parsing if backend provides features
+      recentBids: [], // Fetch bids from separate API if needed
+      buyNowPrice: null, // Depending on if backend supports Buy It Now
+    );
+  }
+
   AuctionItem copyWith({
     String? id,
     String? title,
