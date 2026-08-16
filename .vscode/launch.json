@@ -1,0 +1,11 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "private_vehicle_bidding (Debug Mode)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug"
+    }
+  ]
+}
