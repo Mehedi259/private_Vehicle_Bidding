@@ -45,7 +45,7 @@ class AuctionDetailsRepositoryImpl implements IAuctionDetailsRepository {
       if (parentId != null) {
         body['parent'] = parentId;
       }
-      final response = await ApiService.post('/api/sell/comments/', body: body);
+      final response = await ApiService.post('/api/sell/comments/', body);
       return response.statusCode == 201;
     } catch (e) {
       debugPrint('Failed to post comment: $e');

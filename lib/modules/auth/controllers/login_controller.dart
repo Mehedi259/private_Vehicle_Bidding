@@ -9,8 +9,8 @@ import '../../../../core/services/shared_prefs_service.dart';
 
 class LoginController extends GetxController {
   // ─── Text Controllers ──────────────────────────────────────────────────────
-  final TextEditingController emailController = TextEditingController(text: "mdshobuj204111@gmail.com");
-  final TextEditingController passwordController = TextEditingController(text: "12_3456abc");
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   // ─── Focus Nodes ──────────────────────────────────────────────────────────
   final FocusNode emailFocusNode = FocusNode();

@@ -46,4 +46,26 @@ class Validators {
     }
     return null;
   }
+
+  /// Validates phone number.
+  static String? validatePhone(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Phone number is required';
+    }
+    if (value.trim().length < 8) {
+      return 'Please enter a valid phone number';
+    }
+    return null;
+  }
+
+  /// Validates address.
+  static String? validateAddress(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Address is required';
+    }
+    if (value.trim().length < 5) {
+      return 'Please enter a valid address';
+    }
+    return null;
+  }
 }

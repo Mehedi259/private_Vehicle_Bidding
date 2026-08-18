@@ -87,7 +87,7 @@ class _AppTextFieldState extends State<AppTextField> {
           decoration: InputDecoration(
             hintText: widget.hintText,
             hintStyle: GoogleFonts.poppins(
-              color: const Color(0xFF6B7280),
+              color: const Color(0xFF9CA3AF).withValues(alpha: 0.6), // Blurred / faded look
               fontSize: 14.sp,
               fontWeight: FontWeight.w400,
             ),

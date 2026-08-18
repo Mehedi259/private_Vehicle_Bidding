@@ -7,14 +7,18 @@ import 'dart:convert';
 import '../../../../core/services/api_service.dart';
 class SignUpController extends GetxController {
   // ─── Text Controllers ──────────────────────────────────────────────────────
-  final TextEditingController emailController = TextEditingController(text: "mdshobuj204111@gmail.com");
-  final TextEditingController fullNameController = TextEditingController(text: "Md Shobuj");
-  final TextEditingController passwordController = TextEditingController(text: "12_3456abc");
-  final TextEditingController confirmPasswordController = TextEditingController(text: "12_3456abc");
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
   // ─── Focus Nodes ──────────────────────────────────────────────────────────
   final FocusNode emailFocusNode = FocusNode();
   final FocusNode fullNameFocusNode = FocusNode();
+  final FocusNode phoneFocusNode = FocusNode();
+  final FocusNode addressFocusNode = FocusNode();
   final FocusNode passwordFocusNode = FocusNode();
   final FocusNode confirmPasswordFocusNode = FocusNode();
 
@@ -30,10 +34,14 @@ class SignUpController extends GetxController {
   void onClose() {
     emailController.dispose();
     fullNameController.dispose();
+    phoneController.dispose();
+    addressController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
     emailFocusNode.dispose();
     fullNameFocusNode.dispose();
+    phoneFocusNode.dispose();
+    addressFocusNode.dispose();
     passwordFocusNode.dispose();
     confirmPasswordFocusNode.dispose();
     super.onClose();
@@ -63,6 +71,8 @@ class SignUpController extends GetxController {
         {
           'email': emailController.text.trim(),
           'name': fullNameController.text.trim(),
+          'phone_number': phoneController.text.trim(),
+          'address': addressController.text.trim(),
           'password': passwordController.text,
           'password2': confirmPasswordController.text,
         },

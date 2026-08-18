@@ -10,6 +10,8 @@ import '../../../shared/widgets/app_confirm_password_field.dart';
 import '../../../shared/widgets/app_email_field.dart';
 import '../../../shared/widgets/app_full_name_field.dart';
 import '../../../shared/widgets/app_password_field.dart';
+import '../../../shared/widgets/app_text_field.dart';
+import '../../../core/utils/validators.dart';
 import '../../onboarding/widgets/onboarding_header.dart';
 import '../controllers/sign_up_controller.dart';
 
@@ -62,13 +64,37 @@ class SignUpView extends StatelessWidget {
 
                 // Full Name Field
                 AppFullNameField(
+                  hintText: 'John Doe',
                   controller: controller.fullNameController,
+                ),
+
+                SizedBox(height: 16.h),
+
+                // Phone Number Field
+                AppTextField(
+                  labelText: 'Phone Number',
+                  hintText: '+1 234 567 890',
+                  controller: controller.phoneController,
+                  keyboardType: TextInputType.phone,
+                  validator: Validators.validatePhone,
+                ),
+
+                SizedBox(height: 16.h),
+
+                // Address Field
+                AppTextField(
+                  labelText: 'Address',
+                  hintText: '123 Main Street',
+                  controller: controller.addressController,
+                  keyboardType: TextInputType.streetAddress,
+                  validator: Validators.validateAddress,
                 ),
 
                 SizedBox(height: 16.h),
 
                 // Password Field
                 AppPasswordField(
+                  hintText: '********',
                   controller: controller.passwordController,
                 ),
 
@@ -76,6 +102,7 @@ class SignUpView extends StatelessWidget {
 
                 // Confirm Password Field
                 AppConfirmPasswordField(
+                  hintText: '********',
                   controller: controller.confirmPasswordController,
                   passwordController: controller.passwordController,
                 ),

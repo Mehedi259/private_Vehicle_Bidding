@@ -53,6 +53,8 @@ class LoginView extends StatelessWidget {
 
                 // Email Input Field
                 AppEmailField(
+                  labelText: 'Email Address',
+                  hintText: 'example@gmail.com',
                   controller: controller.emailController,
                 ),
 
@@ -60,6 +62,8 @@ class LoginView extends StatelessWidget {
 
                 // Password Input Field
                 AppPasswordField(
+                  labelText: 'Password',
+                  hintText: '********',
                   controller: controller.passwordController,
                 ),
 

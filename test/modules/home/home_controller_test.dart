@@ -20,6 +20,15 @@ class MockHomeRepository implements IHomeRepository {
   }
 
   @override
+  Future<List<AuctionItem>> getEndingSoonAuctions() async {
+    await Future.delayed(const Duration(milliseconds: 10));
+    if (shouldFail) {
+      throw Exception('Repository error');
+    }
+    return auctions;
+  }
+
+  @override
   Future<List<CategoryModel>> getCategories() async {
     await Future.delayed(const Duration(milliseconds: 10));
     if (shouldFail) {
