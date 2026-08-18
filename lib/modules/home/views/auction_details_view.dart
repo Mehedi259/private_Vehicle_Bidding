@@ -353,7 +353,7 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                           SizedBox(height: 24.h),
 
                           // 10. Location Card
-                          _buildLocationSection(),
+                          _buildLocationSection(item),
                           SizedBox(height: 24.h),
 
                           // 11. Comments Section

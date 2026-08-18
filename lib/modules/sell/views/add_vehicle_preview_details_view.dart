@@ -523,7 +523,10 @@ class AddVehiclePreviewDetailsView extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 16.h),
-              const MockMapWidget(),
+              MockMapWidget(
+                city: controller.cityController.text.trim(),
+                state: controller.stateController.text.trim(),
+              ),
             ],
           ),
         ),
