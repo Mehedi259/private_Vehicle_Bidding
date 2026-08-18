@@ -49,6 +49,12 @@
 		</dict>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
+		<key>NSCameraUsageDescription</key>
+		<string>This app requires camera access to take a picture of your vehicle and ID for verification.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>This app requires access to your photo library to upload pictures of your vehicle and ID.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>This app requires microphone access for recording video if needed.</string>
 		<key>UILaunchStoryboardName</key>
 		<string>LaunchScreen</string>
 		<key>UIMainStoryboardFile</key>

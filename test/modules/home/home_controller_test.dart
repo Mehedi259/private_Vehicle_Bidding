@@ -16,7 +16,7 @@ class MockHomeRepository implements IHomeRepository {
   }
 
   @override
-  Future<List<AuctionItem>> getFeaturedAuctions() async {
+  Future<List<AuctionItem>> getFeaturedAuctions({String? categoryId}) async {
     await Future.delayed(const Duration(milliseconds: 10));
     if (shouldFail) {
       throw Exception('Repository error');
@@ -25,7 +25,7 @@ class MockHomeRepository implements IHomeRepository {
   }
 
   @override
-  Future<List<AuctionItem>> getEndingSoonAuctions() async {
+  Future<List<AuctionItem>> getEndingSoonAuctions({String? categoryId}) async {
     await Future.delayed(const Duration(milliseconds: 10));
     if (shouldFail) {
       throw Exception('Repository error');

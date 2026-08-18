@@ -8,9 +8,14 @@ import '../../core/services/api_service.dart';
 
 class HomeRepositoryImpl implements IHomeRepository {
   @override
-  Future<List<AuctionItem>> getFeaturedAuctions() async {
+  Future<List<AuctionItem>> getFeaturedAuctions({String? categoryId}) async {
     try {
-      final response = await ApiService.get('/api/sell/posts/latest/');
+      String endpoint = '/api/sell/posts/latest/';
+      if (categoryId != null && categoryId != 'all') {
+        final vehicleType = _mapCategoryIdToVehicleType(categoryId);
+        endpoint = '/api/sell/posts/latest/?vehicle_type=$vehicleType';
+      }
+      final response = await ApiService.get(endpoint);
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         return data.map((json) => AuctionItem.fromJson(json)).toList();
@@ -22,9 +27,14 @@ class HomeRepositoryImpl implements IHomeRepository {
     }
   }
   @override
-  Future<List<AuctionItem>> getEndingSoonAuctions() async {
+  Future<List<AuctionItem>> getEndingSoonAuctions({String? categoryId}) async {
     try {
-      final response = await ApiService.get('/api/sell/posts/ending-soon/');
+      String endpoint = '/api/sell/posts/ending-soon/';
+      if (categoryId != null && categoryId != 'all') {
+        final vehicleType = _mapCategoryIdToVehicleType(categoryId);
+        endpoint = '/api/sell/posts/ending-soon/?vehicle_type=$vehicleType';
+      }
+      final response = await ApiService.get(endpoint);
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         return data.map((json) => AuctionItem.fromJson(json)).toList();
@@ -57,6 +67,23 @@ class HomeRepositoryImpl implements IHomeRepository {
       return true;
     } else {
       throw Exception(response.body); // Pass the raw response body so controller can parse it
+    }
+  }
+
+  String _mapCategoryIdToVehicleType(String categoryId) {
+    switch (categoryId) {
+      case 'cars':
+        return 'Car';
+      case 'bikes':
+        return 'Motorcycle';
+      case 'trucks':
+        return 'Truck';
+      case 'boats':
+        return 'Boat';
+      case 'aircraft':
+        return 'Aircraft';
+      default:
+        return 'Car';
     }
   }
 }

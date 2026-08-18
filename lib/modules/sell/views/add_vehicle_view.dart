@@ -588,6 +588,117 @@ class AddVehicleView extends StatelessWidget {
     }
   }
 
+  // Camera vs Gallery selfie source chooser bottom sheet
+  void _showSelfieSourceBottomSheet(BuildContext context, AddVehicleController controller) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 38.w,
+                  height: 4.h,
+                  margin: EdgeInsets.only(bottom: 20.h),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD1D5DB),
+                    borderRadius: BorderRadius.circular(2.r),
+                  ),
+                ),
+                Text(
+                  'Select Selfie Source',
+                  style: GoogleFonts.outfit(
+                    color: const Color(0xFF2A2A2A),
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 20.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        controller.pickSelfie(ImageSource.camera);
+                      },
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 60.r,
+                            height: 60.r,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF1F5F9),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.camera_alt_outlined,
+                              color: const Color(0xFF1B4E9F),
+                              size: 28.r,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            'Camera',
+                            style: GoogleFonts.poppins(
+                              color: const Color(0xFF2A2A2A),
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        controller.pickSelfie(ImageSource.gallery);
+                      },
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 60.r,
+                            height: 60.r,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF1F5F9),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.photo_library_outlined,
+                              color: const Color(0xFF1B4E9F),
+                              size: 28.r,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            'Gallery',
+                            style: GoogleFonts.poppins(
+                              color: const Color(0xFF2A2A2A),
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10.h),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   // Camera vs Gallery image source chooser bottom sheet
   void _showImageSourceBottomSheet(BuildContext context, AddVehicleController controller) {
     showModalBottomSheet(
@@ -1248,7 +1359,7 @@ class AddVehicleView extends StatelessWidget {
         SizedBox(height: 12.h),
 
         // Selfie Picker
-        _buildSelfieUploadArea(controller),
+        _buildSelfieUploadArea(controller, context),
         SizedBox(height: 24.h),
 
         // Location Section
@@ -1358,11 +1469,11 @@ class AddVehicleView extends StatelessWidget {
   }
 
   // Selfie upload dotted card helper
-  Widget _buildSelfieUploadArea(AddVehicleController controller) {
+  Widget _buildSelfieUploadArea(AddVehicleController controller, BuildContext context) {
     return Obx(() {
       if (controller.selfieImagePath.value == null) {
         return GestureDetector(
-          onTap: () => controller.pickSelfie(),
+          onTap: () => _showSelfieSourceBottomSheet(context, controller),
           child: CustomPaint(
             painter: DashedBorderPainter(
               color: const Color(0xFF1B4E9F),

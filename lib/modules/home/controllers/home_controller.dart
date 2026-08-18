@@ -28,25 +28,38 @@ class HomeController extends GetxController {
 
   List<AuctionItem> get filteredAuctions {
     return featuredAuctions.where((item) {
-      final matchesCategory = selectedCategory.value == 'all' || item.category == selectedCategory.value;
       final matchesSearch = searchQuery.value.isEmpty || item.title.toLowerCase().contains(searchQuery.value.toLowerCase());
-      return matchesCategory && matchesSearch;
+      return matchesSearch;
     }).toList();
   }
 
   List<AuctionItem> get filteredEndingSoonAuctions {
     return endingSoonAuctions.where((item) {
-      final matchesCategory = selectedCategory.value == 'all' || item.category == selectedCategory.value;
       final matchesSearch = searchQuery.value.isEmpty || item.title.toLowerCase().contains(searchQuery.value.toLowerCase());
-      return matchesCategory && matchesSearch;
+      return matchesSearch;
     }).toList();
   }
 
-  void selectCategory(String categoryId) {
+  Future<void> selectCategory(String categoryId) async {
     if (selectedCategory.value == categoryId) {
       selectedCategory.value = 'all';
     } else {
       selectedCategory.value = categoryId;
+    }
+    
+    // Fetch auctions with the new category
+    isLoading.value = true;
+    try {
+      final futures = await Future.wait([
+        _homeRepository.getFeaturedAuctions(categoryId: selectedCategory.value),
+        _homeRepository.getEndingSoonAuctions(categoryId: selectedCategory.value),
+      ]);
+      featuredAuctions.assignAll(futures[0]);
+      endingSoonAuctions.assignAll(futures[1]);
+    } catch (e) {
+      Get.log("Error filtering by category: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -154,8 +167,8 @@ class HomeController extends GetxController {
     isLoading.value = true;
     try {
       final futures = await Future.wait([
-        _homeRepository.getFeaturedAuctions(),
-        _homeRepository.getEndingSoonAuctions(),
+        _homeRepository.getFeaturedAuctions(categoryId: selectedCategory.value),
+        _homeRepository.getEndingSoonAuctions(categoryId: selectedCategory.value),
         _homeRepository.getCategories(),
       ]);
 
