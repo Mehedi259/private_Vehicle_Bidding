@@ -62,6 +62,9 @@ class AuctionItem {
   final String state;
   final String city;
   final String zipCode;
+  
+  // Timing
+  final DateTime? endTime;
 
   const AuctionItem({
     required this.id,
@@ -84,6 +87,7 @@ class AuctionItem {
     this.state = '',
     this.city = '',
     this.zipCode = '',
+    this.endTime,
   });
 
   factory AuctionItem.fromJson(Map<String, dynamic> json) {
@@ -131,6 +135,7 @@ class AuctionItem {
       state: json['state']?.toString() ?? '',
       city: json['city']?.toString() ?? '',
       zipCode: json['zip_code']?.toString() ?? '',
+      endTime: json['end_time'] != null ? DateTime.tryParse(json['end_time']) : null,
     );
   }
 
