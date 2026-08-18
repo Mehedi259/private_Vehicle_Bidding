@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class BidLog {
   final String bidderName;
   final double amount;
@@ -84,6 +86,20 @@ class AuctionItem {
 
     final seller = json['seller_details'] ?? {};
 
+    List<String> parsedFeatures = [];
+    if (json['features'] != null) {
+      if (json['features'] is String) {
+        try {
+          final decoded = jsonDecode(json['features']) as List;
+          parsedFeatures = decoded.map((e) => e.toString()).toList();
+        } catch (_) {
+          // If decoding fails, just add the string itself or leave empty
+        }
+      } else if (json['features'] is List) {
+        parsedFeatures = (json['features'] as List).map((e) => e.toString()).toList();
+      }
+    }
+
     return AuctionItem(
       id: json['id']?.toString() ?? '',
       title: '${json['year']} ${json['make']} ${json['model']}',
@@ -98,7 +114,7 @@ class AuctionItem {
       description: json['description'] ?? '',
       verifiedSeller: seller['is_id_verified'] == true,
       vinVerified: json['is_vin_verified'] == true,
-      features: (json['features'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      features: parsedFeatures,
       recentBids: (json['bids'] as List<dynamic>?)?.map((e) => BidLog.fromJson(e)).toList() ?? [],
       buyNowPrice: null, // Depending on if backend supports Buy It Now
     );

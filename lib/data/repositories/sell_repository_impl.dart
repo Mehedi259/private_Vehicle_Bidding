@@ -3,16 +3,7 @@ import '../../core/interfaces/i_sell_repository.dart';
 import '../models/listed_vehicle.dart';
 
 class SellRepositoryImpl implements ISellRepository {
-  final List<ListedVehicle> _mockListings = [
-    const ListedVehicle(
-      id: '1',
-      title: '2022 Ford F-150 XLT',
-      imageUrl: CustomAssets.fordF150,
-      lastBid: 18500.0,
-      bidsCount: 43,
-      status: VehicleStatus.sold,
-    ),
-  ];
+  final List<ListedVehicle> _mockListings = [];
 
   @override
   Future<List<ListedVehicle>> getListedVehicles() async {
