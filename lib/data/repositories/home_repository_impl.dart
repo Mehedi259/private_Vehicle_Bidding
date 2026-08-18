@@ -18,7 +18,14 @@ class HomeRepositoryImpl implements IHomeRepository {
       final response = await ApiService.get(endpoint);
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        return data.map((json) => AuctionItem.fromJson(json)).toList();
+        List<AuctionItem> items = data.map((json) => AuctionItem.fromJson(json)).toList();
+        
+        // Fallback local filtering because backend /latest/ endpoint currently ignores vehicle_type
+        if (categoryId != null && categoryId != 'all') {
+          final vehicleType = _mapCategoryIdToVehicleType(categoryId);
+          items = items.where((item) => item.category.toLowerCase() == vehicleType.toLowerCase()).toList();
+        }
+        return items;
       }
       return [];
     } catch (e) {
@@ -37,7 +44,14 @@ class HomeRepositoryImpl implements IHomeRepository {
       final response = await ApiService.get(endpoint);
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        return data.map((json) => AuctionItem.fromJson(json)).toList();
+        List<AuctionItem> items = data.map((json) => AuctionItem.fromJson(json)).toList();
+        
+        // Fallback local filtering because backend /ending-soon/ endpoint currently ignores vehicle_type
+        if (categoryId != null && categoryId != 'all') {
+          final vehicleType = _mapCategoryIdToVehicleType(categoryId);
+          items = items.where((item) => item.category.toLowerCase() == vehicleType.toLowerCase()).toList();
+        }
+        return items;
       }
       return [];
     } catch (e) {

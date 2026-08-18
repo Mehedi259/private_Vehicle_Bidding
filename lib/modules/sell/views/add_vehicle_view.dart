@@ -1566,7 +1566,15 @@ class AddVehicleView extends StatelessWidget {
   Widget _buildMapView(AddVehicleController controller, BuildContext context) {
     return Column(
       children: [
-        const MockMapWidget(),
+        AnimatedBuilder(
+          animation: Listenable.merge([controller.stateController, controller.cityController]),
+          builder: (context, child) {
+            return MockMapWidget(
+              state: controller.stateController.text.trim(),
+              city: controller.cityController.text.trim(),
+            );
+          },
+        ),
         SizedBox(height: 8.h),
         Container(
           width: double.infinity,
@@ -2260,7 +2268,14 @@ class AddVehicleView extends StatelessWidget {
 
 // Styled mock vector map widget
 class MockMapWidget extends StatelessWidget {
-  const MockMapWidget({super.key});
+  final String city;
+  final String state;
+
+  const MockMapWidget({
+    super.key,
+    required this.city,
+    required this.state,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -2347,7 +2362,7 @@ class MockMapWidget extends StatelessWidget {
               left: 60.w,
               top: 20.h,
               child: Text(
-                'Dubai',
+                state.isNotEmpty ? state : 'State',
                 style: GoogleFonts.outfit(
                   color: const Color(0xFF2A2A2A),
                   fontSize: 16.sp,
@@ -2359,7 +2374,7 @@ class MockMapWidget extends StatelessWidget {
               right: 50.w,
               bottom: 30.h,
               child: Text(
-                'Al Aweer',
+                city.isNotEmpty ? city : 'City',
                 style: GoogleFonts.outfit(
                   color: const Color(0xFF2A2A2A),
                   fontSize: 12.sp,

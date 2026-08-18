@@ -47,6 +47,20 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
     super.dispose();
   }
 
+  String _formatTimeAgo(String? timestamp) {
+    if (timestamp == null || timestamp.isEmpty) return 'Just now';
+    try {
+      final DateTime time = DateTime.parse(timestamp);
+      final Duration diff = DateTime.now().difference(time);
+      if (diff.inDays > 0) return '${diff.inDays}d ago';
+      if (diff.inHours > 0) return '${diff.inHours}h ago';
+      if (diff.inMinutes > 0) return '${diff.inMinutes}m ago';
+      return 'Just now';
+    } catch (e) {
+      return 'Just now';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.simpleCurrency(name: '\$', decimalDigits: 0);
@@ -975,8 +989,8 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
     );
   }
 
-  // Location card builder
-  Widget _buildLocationSection() {
+  // Location Section Builder
+  Widget _buildLocationSection(AuctionItem item) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1001,6 +1015,25 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
               borderRadius: BorderRadius.circular(16.r),
             ),
           ),
+        ),
+        SizedBox(height: 12.h),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.location_on_outlined, color: const Color(0xFF1B4E9F), size: 20.sp),
+            SizedBox(width: 8.w),
+            Expanded(
+              child: Text(
+                [item.country, item.state, item.city, item.zipCode]
+                    .where((e) => e.isNotEmpty)
+                    .join(', '),
+                style: GoogleFonts.outfit(
+                  color: const Color(0xFF2A2A2A),
+                  fontSize: 14.sp,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -1097,22 +1130,27 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                       CircleAvatar(
                         radius: 16.r,
                         backgroundColor: const Color(0xFFF1F5F9),
-                        child: Text(
-                          (comment['user'] is Map<String, dynamic> && comment['user']['name'] != null && comment['user']['name'].toString().isNotEmpty)
-                              ? comment['user']['name'][0].toUpperCase()
-                              : 'U',
-                          style: GoogleFonts.outfit(color: const Color(0xFF1B4E9F), fontWeight: FontWeight.bold),
-                        ),
+                        backgroundImage: (comment['user_avatar'] != null && comment['user_avatar'].toString().isNotEmpty)
+                            ? NetworkImage(comment['user_avatar'])
+                            : null,
+                        child: (comment['user_avatar'] != null && comment['user_avatar'].toString().isNotEmpty)
+                            ? null
+                            : Text(
+                                (comment['user_name'] != null && comment['user_name'].toString().isNotEmpty)
+                                    ? comment['user_name'][0].toUpperCase()
+                                    : 'U',
+                                style: GoogleFonts.outfit(color: const Color(0xFF1B4E9F), fontWeight: FontWeight.bold),
+                              ),
                       ),
                       SizedBox(width: 8.w),
                       Expanded(
                         child: Text(
-                          (comment['user'] is Map<String, dynamic>) ? comment['user']['name'] ?? 'User' : 'User',
+                          comment['user_name']?.toString() ?? 'User',
                           style: GoogleFonts.outfit(fontWeight: FontWeight.w600, fontSize: 14.sp),
                         ),
                       ),
                       Text(
-                        'Just now', // Ideally formatted from comment['created_at']
+                        _formatTimeAgo(comment['created_at']),
                         style: GoogleFonts.outfit(color: Colors.grey, fontSize: 12.sp),
                       ),
                     ],

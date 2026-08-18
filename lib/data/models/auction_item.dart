@@ -57,6 +57,12 @@ class AuctionItem {
   final List<BidLog> recentBids;
   final double? buyNowPrice;
 
+  // Location fields
+  final String country;
+  final String state;
+  final String city;
+  final String zipCode;
+
   const AuctionItem({
     required this.id,
     required this.title,
@@ -74,6 +80,10 @@ class AuctionItem {
     this.features = const [],
     this.recentBids = const [],
     this.buyNowPrice,
+    this.country = '',
+    this.state = '',
+    this.city = '',
+    this.zipCode = '',
   });
 
   factory AuctionItem.fromJson(Map<String, dynamic> json) {
@@ -116,7 +126,11 @@ class AuctionItem {
       vinVerified: json['is_vin_verified'] == true,
       features: parsedFeatures,
       recentBids: (json['bids'] as List<dynamic>?)?.map((e) => BidLog.fromJson(e)).toList() ?? [],
-      buyNowPrice: null, // Depending on if backend supports Buy It Now
+      buyNowPrice: double.tryParse(json['buy_now_price']?.toString() ?? ''),
+      country: json['country']?.toString() ?? '',
+      state: json['state']?.toString() ?? '',
+      city: json['city']?.toString() ?? '',
+      zipCode: json['zip_code']?.toString() ?? '',
     );
   }
 
