@@ -13,6 +13,7 @@ import '../../modules/browse/views/browse_view.dart';
 import '../../modules/my_bid/views/my_bid_view.dart';
 import '../../modules/profile/views/profile_view.dart';
 import '../../modules/profile/views/edit_profile_view.dart';
+import '../../modules/profile/views/payment_methods_view.dart';
 import '../../modules/profile/views/profile_verification_view.dart';
 import '../../modules/profile/views/security_view.dart';
 import '../../modules/profile/views/change_password_view.dart';
@@ -27,10 +28,11 @@ import '../../modules/home/views/notifications_view.dart';
 import '../../modules/sell/views/add_vehicle_view.dart';
 import '../../modules/sell/views/add_vehicle_preview_details_view.dart';
 import '../constants/app_routes.dart';
+import '../services/shared_prefs_service.dart';
 
 class AppRouter {
   static final router = GoRouter(
-    initialLocation: AppRoutes.onboarding,
+    initialLocation: SharedPrefsService.getAccessToken() != null ? AppRoutes.home : AppRoutes.onboarding,
     routes: [
       GoRoute(
         path: AppRoutes.onboarding,
@@ -93,6 +95,10 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.editProfile,
         builder: (context, state) => const EditProfileView(),
+      ),
+      GoRoute(
+        path: AppRoutes.paymentMethods,
+        builder: (context, state) => const PaymentMethodsView(),
       ),
       GoRoute(
         path: AppRoutes.profileVerification,

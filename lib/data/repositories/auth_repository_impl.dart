@@ -1,5 +1,6 @@
 import '../../core/interfaces/i_auth_repository.dart';
 import '../../core/services/api_service.dart';
+import '../../core/services/shared_prefs_service.dart';
 import 'dart:convert';
 
 class AuthRepositoryImpl implements IAuthRepository {
@@ -14,7 +15,23 @@ class AuthRepositoryImpl implements IAuthRepository {
         },
         requireAuth: false,
       );
-      return response.statusCode == 200 || response.statusCode == 201;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        if (data['token'] != null) {
+          await SharedPrefsService.saveTokens(
+            access: data['token']['access'],
+            refresh: data['token']['refresh'],
+          );
+        }
+        if (data['user'] != null) {
+          await SharedPrefsService.saveUser(
+            id: data['user']['id']?.toString(),
+            email: data['user']['email'],
+          );
+        }
+        return true;
+      }
+      return false;
     } catch (e) {
       return false;
     }

@@ -42,15 +42,29 @@ class EditProfileController extends GetxController {
     // Initialize DOB
     if (currentUser.dob != null) {
       try {
-        dob.value = DateFormat('dd/MM/yyyy').parse(currentUser.dob!);
+        // Try parsing ISO format first (standard backend format)
+        dob.value = DateTime.parse(currentUser.dob!);
       } catch (_) {
-        dob.value = null;
+        try {
+          // Fallback to dd/MM/yyyy if it's formatted differently
+          dob.value = DateFormat('dd/MM/yyyy').parse(currentUser.dob!);
+        } catch (_) {
+          dob.value = null;
+        }
       }
     }
 
     // Initialize gender
-    if (currentUser.gender != null) {
+    // Initialize gender
+    final validGenders = ['Male', 'Female', 'Other'];
+    if (currentUser.gender != null && validGenders.contains(currentUser.gender)) {
       gender.value = currentUser.gender!;
+    } else if (currentUser.gender != null && currentUser.gender!.toLowerCase() == 'female') {
+      gender.value = 'Female';
+    } else if (currentUser.gender != null && currentUser.gender!.toLowerCase() == 'male') {
+      gender.value = 'Male';
+    } else {
+      gender.value = 'Other';
     }
   }
 
@@ -117,7 +131,7 @@ class EditProfileController extends GetxController {
     isLoading.value = true;
 
     try {
-      final dobStr = dob.value != null ? DateFormat('dd-MM-yyyy').format(dob.value!) : null; // Backend might need specific format, assuming dd-MM-yyyy or similar
+      final dobStr = dob.value != null ? DateFormat('yyyy-MM-dd').format(dob.value!) : null;
 
       Map<String, String> fields = {
         'name': nameController.text.trim(),

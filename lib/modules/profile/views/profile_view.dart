@@ -113,6 +113,14 @@ class ProfileView extends StatelessWidget {
                       SizedBox(height: 12.h),
 
                       AppListTile(
+                        title: 'Payment Methods',
+                        leadingIcon: Icons.credit_card_outlined,
+                        showIconBorder: false,
+                        onTap: () => controller.managePaymentMethods(context),
+                      ),
+                      SizedBox(height: 12.h),
+
+                      AppListTile(
                         title: 'Subscription',
                         leadingIcon: Icons.receipt_long_outlined,
                         showIconBorder: false,

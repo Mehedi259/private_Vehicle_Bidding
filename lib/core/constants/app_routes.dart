@@ -14,6 +14,7 @@ class AppRoutes {
   static const String myBid = '/my-bid';
   static const String profile = '/profile';
   static const String editProfile = '/edit-profile';
+  static const String paymentMethods = '/payment-methods';
   static const String profileVerification = '/profile-verification';
   static const String security = '/security';
   static const String changePassword = '/change-password';

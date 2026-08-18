@@ -8,6 +8,31 @@ class BidLog {
     required this.amount,
     required this.timeAgo,
   });
+
+  factory BidLog.fromJson(Map<String, dynamic> json) {
+    String parsedTimeAgo = 'Just now';
+    if (json['placed_at'] != null) {
+      try {
+        final DateTime placed = DateTime.parse(json['placed_at']);
+        final Duration diff = DateTime.now().difference(placed);
+        if (diff.inDays > 0) {
+          parsedTimeAgo = '${diff.inDays}d ago';
+        } else if (diff.inHours > 0) {
+          parsedTimeAgo = '${diff.inHours}h ago';
+        } else if (diff.inMinutes > 0) {
+          parsedTimeAgo = '${diff.inMinutes}m ago';
+        }
+      } catch (e) {
+        parsedTimeAgo = json['placed_at'].toString();
+      }
+    }
+
+    return BidLog(
+      bidderName: json['bidder_name'] ?? 'Unknown',
+      amount: double.tryParse(json['amount']?.toString() ?? '0') ?? 0.0,
+      timeAgo: parsedTimeAgo,
+    );
+  }
 }
 
 class AuctionItem {
@@ -63,8 +88,8 @@ class AuctionItem {
       id: json['id']?.toString() ?? '',
       title: '${json['year']} ${json['make']} ${json['model']}',
       imageUrl: primaryImage,
-      currentBid: double.tryParse(json['highest_bid_amount']?.toString() ?? '0') ?? 0.0,
-      bidsCount: json['total_bids_count'] ?? 0,
+      currentBid: double.tryParse(json['current_highest_bid']?.toString() ?? '0') ?? 0.0,
+      bidsCount: json['total_bids'] ?? 0,
       category: (json['vehicle_type']?.toString() ?? 'cars').toLowerCase(),
       subtitle: '${json['make']} ${json['model']}',
       mileage: '${json['mileage']} M',
@@ -73,8 +98,8 @@ class AuctionItem {
       description: json['description'] ?? '',
       verifiedSeller: seller['is_id_verified'] == true,
       vinVerified: json['is_vin_verified'] == true,
-      features: [], // Might need parsing if backend provides features
-      recentBids: [], // Fetch bids from separate API if needed
+      features: (json['features'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      recentBids: (json['bids'] as List<dynamic>?)?.map((e) => BidLog.fromJson(e)).toList() ?? [],
       buyNowPrice: null, // Depending on if backend supports Buy It Now
     );
   }

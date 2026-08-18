@@ -37,11 +37,16 @@ class ProfileController extends GetxController {
       final response = await ApiService.get('/accounts/user/profile/', requireAuth: true);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        String? avatarUrl = data['image'];
+        if (avatarUrl != null && avatarUrl.startsWith('/')) {
+          avatarUrl = '${ApiService.baseUrl}$avatarUrl';
+        }
+
         user.value = UserModel(
           id: data['id']?.toString() ?? '',
           name: data['name'] ?? '',
           email: data['email'] ?? '',
-          avatarUrl: data['image'] ?? '',
+          avatarUrl: avatarUrl ?? '',
           dob: data['dob'] ?? '',
           gender: data['gender'] ?? '',
         );
@@ -56,6 +61,11 @@ class ProfileController extends GetxController {
   /// Trigger edit profile flow
   void editProfile(BuildContext context) {
     context.push(AppRoutes.editProfile);
+  }
+
+  /// Trigger payment methods flow
+  void managePaymentMethods(BuildContext context) {
+    context.push(AppRoutes.paymentMethods);
   }
 
   /// Trigger verification flow

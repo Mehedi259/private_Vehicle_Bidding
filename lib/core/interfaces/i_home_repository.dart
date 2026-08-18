@@ -5,4 +5,5 @@ abstract class IHomeRepository {
   Future<List<AuctionItem>> getFeaturedAuctions();
   Future<List<AuctionItem>> getEndingSoonAuctions();
   Future<List<CategoryModel>> getCategories();
+  Future<bool> placeBid(String sellPostId, double amount);
 }

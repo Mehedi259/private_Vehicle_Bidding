@@ -10,7 +10,7 @@ class HomeRepositoryImpl implements IHomeRepository {
   @override
   Future<List<AuctionItem>> getFeaturedAuctions() async {
     try {
-      final response = await ApiService.get('/api/sell/posts/latest/', requireAuth: false);
+      final response = await ApiService.get('/api/sell/posts/latest/');
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         return data.map((json) => AuctionItem.fromJson(json)).toList();
@@ -24,7 +24,7 @@ class HomeRepositoryImpl implements IHomeRepository {
   @override
   Future<List<AuctionItem>> getEndingSoonAuctions() async {
     try {
-      final response = await ApiService.get('/api/sell/posts/ending-soon/', requireAuth: false);
+      final response = await ApiService.get('/api/sell/posts/ending-soon/');
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         return data.map((json) => AuctionItem.fromJson(json)).toList();
@@ -45,5 +45,18 @@ class HomeRepositoryImpl implements IHomeRepository {
       CategoryModel(id: 'boats', title: 'Boats', icon: Icons.directions_boat_outlined),
       CategoryModel(id: 'aircraft', title: 'Aircraft', icon: Icons.flight_outlined),
     ];
+  }
+
+  @override
+  Future<bool> placeBid(String sellPostId, double amount) async {
+    final response = await ApiService.post('/api/bids/', {
+      'sell_post_id': sellPostId,
+      'amount': amount,
+    });
+    if (response.statusCode == 201) {
+      return true;
+    } else {
+      throw Exception(response.body); // Pass the raw response body so controller can parse it
+    }
   }
 }

@@ -58,17 +58,27 @@ class LoginController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        final access = data['token']['access'];
-        final refresh = data['token']['refresh'];
-
-        await SharedPrefsService.saveTokens(access: access, refresh: refresh);
         
-        // Optionally save user info if it returns
-        // await SharedPrefsService.saveUser(email: emailController.text.trim());
+        final access = data['access'];
+        final refresh = data['refresh'];
+
+        if (access != null && refresh != null) {
+          await SharedPrefsService.saveTokens(access: access, refresh: refresh);
+        }
+        
+        if (data['user'] != null) {
+          await SharedPrefsService.saveUser(
+            id: data['user']['id']?.toString(),
+            email: data['user']['email'],
+          );
+        }
+
+        // Dismiss keyboard to prevent 'Floating SnackBar presented off screen' exception
+        FocusManager.instance.primaryFocus?.unfocus();
 
         if (context.mounted) {
-          context.go(AppRoutes.home);
           SnackbarHelper.showSuccess('Logged in successfully!');
+          context.go(AppRoutes.home);
         }
       } else {
         final error = jsonDecode(response.body);

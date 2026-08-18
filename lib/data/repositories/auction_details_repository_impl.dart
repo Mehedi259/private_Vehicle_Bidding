@@ -57,7 +57,7 @@ class AuctionDetailsRepositoryImpl implements IAuctionDetailsRepository {
   Future<bool> placeBid(String sellPostId, double amount) async {
     try {
       final response = await ApiService.post('/api/bids/', {
-        'sell_post': sellPostId,
+        'sell_post_id': sellPostId,
         'amount': amount,
       });
       return response.statusCode == 201;

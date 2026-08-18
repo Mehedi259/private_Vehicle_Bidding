@@ -19,7 +19,33 @@ class ApiService {
         headers['Authorization'] = 'Bearer $token';
       }
     }
+    if (_cookies.isNotEmpty) {
+      headers['Cookie'] = _cookies.entries.map((e) => '${e.key}=${e.value}').join('; ');
+    }
     return headers;
+  }
+
+  static final Map<String, String> _cookies = {};
+
+  static void _updateCookies(http.BaseResponse response) {
+    String? rawCookie = response.headers['set-cookie'];
+    if (rawCookie != null) {
+      // Basic cookie parser (handles AWSALB and session cookies)
+      // Dates contain commas, so this split might split dates, but the first part
+      // (key=value) will still be extracted correctly.
+      var parts = rawCookie.split(RegExp(r',(?=[a-zA-Z_]+=)'));
+      if (parts.isEmpty) parts = [rawCookie];
+      
+      for (var part in parts) {
+        int index = part.indexOf(';');
+        String cookie = (index == -1) ? part : part.substring(0, index);
+        var kv = cookie.split('=');
+        if (kv.length >= 2) {
+          _cookies[kv[0].trim()] = kv.sublist(1).join('=').trim();
+        }
+      }
+      debugPrint('🍪 [API COOKIES UPDATED] $_cookies');
+    }
   }
 
   static void _logRequest(String method, Uri url, Map<String, String> headers, [Object? body]) {
@@ -40,6 +66,7 @@ class ApiService {
     final headers = _headers(requireAuth);
     _logRequest('GET', url, headers);
     final response = await http.get(url, headers: headers);
+    _updateCookies(response);
     _logResponse(response);
     return response;
   }
@@ -50,6 +77,7 @@ class ApiService {
     final bodyStr = jsonEncode(body);
     _logRequest('POST', url, headers, bodyStr);
     final response = await http.post(url, headers: headers, body: bodyStr);
+    _updateCookies(response);
     _logResponse(response);
     return response;
   }
@@ -60,6 +88,7 @@ class ApiService {
     final bodyStr = jsonEncode(body);
     _logRequest('PATCH', url, headers, bodyStr);
     final response = await http.patch(url, headers: headers, body: bodyStr);
+    _updateCookies(response);
     _logResponse(response);
     return response;
   }
@@ -71,6 +100,7 @@ class ApiService {
     _logRequest('DELETE', url, headers, bodyStr);
     
     final response = await http.delete(url, headers: headers, body: bodyStr);
+    _updateCookies(response);
     _logResponse(response);
     return response;
   }
@@ -110,6 +140,7 @@ class ApiService {
     }
 
     final streamedResponse = await request.send();
+    _updateCookies(streamedResponse);
     debugPrint('⬅️ [API RESPONSE] MULTIPART [${streamedResponse.statusCode}] $url');
     // We don't read the stream here to avoid consuming it before caller needs it.
     return streamedResponse;

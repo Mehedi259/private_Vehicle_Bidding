@@ -1098,7 +1098,7 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                         radius: 16.r,
                         backgroundColor: const Color(0xFFF1F5F9),
                         child: Text(
-                          comment['user'] != null && comment['user']['name'] != null
+                          (comment['user'] is Map<String, dynamic> && comment['user']['name'] != null && comment['user']['name'].toString().isNotEmpty)
                               ? comment['user']['name'][0].toUpperCase()
                               : 'U',
                           style: GoogleFonts.outfit(color: const Color(0xFF1B4E9F), fontWeight: FontWeight.bold),
@@ -1107,7 +1107,7 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                       SizedBox(width: 8.w),
                       Expanded(
                         child: Text(
-                          comment['user'] != null ? comment['user']['name'] ?? 'User' : 'User',
+                          (comment['user'] is Map<String, dynamic>) ? comment['user']['name'] ?? 'User' : 'User',
                           style: GoogleFonts.outfit(fontWeight: FontWeight.w600, fontSize: 14.sp),
                         ),
                       ),

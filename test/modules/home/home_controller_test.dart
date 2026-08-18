@@ -11,6 +11,11 @@ class MockHomeRepository implements IHomeRepository {
   bool shouldFail = false;
 
   @override
+  Future<bool> placeBid(String sellPostId, double amount) async {
+    return !shouldFail;
+  }
+
+  @override
   Future<List<AuctionItem>> getFeaturedAuctions() async {
     await Future.delayed(const Duration(milliseconds: 10));
     if (shouldFail) {
