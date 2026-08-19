@@ -472,12 +472,12 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
             onTap: () {
               PlaceBidDialog.show(context, item).then((bidAmount) async {
                 if (bidAmount != null) {
-                  final success = await controller.placeBid(bidAmount);
-                  if (success) {
+                  final errorMsg = await controller.placeBid(bidAmount);
+                  if (errorMsg == null) {
                     final currencyFormat = NumberFormat.simpleCurrency(name: '\$', decimalDigits: 0);
                     SnackbarHelper.showSuccess('Bid of ${currencyFormat.format(bidAmount)} placed successfully!');
                   } else {
-                    SnackbarHelper.showError('Failed to place bid. Please try again.');
+                    SnackbarHelper.showError(errorMsg);
                   }
                 }
               });
@@ -863,40 +863,38 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
               ),
             )
           else
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 5,
-                crossAxisSpacing: 10.w,
-                mainAxisSpacing: 8.h,
-              ),
-              itemCount: item.features.length,
-              itemBuilder: (context, index) {
-                final feature = item.features[index];
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.check_rounded,
-                      color: const Color(0xFF1B4E9F),
-                      size: 16.sp,
-                    ),
-                    SizedBox(width: 6.w),
-                    Expanded(
-                      child: Text(
-                        feature,
-                        style: GoogleFonts.outfit(
+            Wrap(
+              spacing: 16.w,
+              runSpacing: 12.h,
+              children: item.features.map((feature) {
+                return FractionallySizedBox(
+                  widthFactor: 0.47, // slightly less than half to fit two items with spacing
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 2.h), // align icon with first line of text
+                        child: Icon(
+                          Icons.check_rounded,
                           color: const Color(0xFF1B4E9F),
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w400,
+                          size: 16.sp,
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(width: 6.w),
+                      Expanded(
+                        child: Text(
+                          feature,
+                          style: GoogleFonts.outfit(
+                            color: const Color(0xFF1B4E9F),
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 );
-              },
+              }).toList(),
             ),
         ],
       ),
@@ -1228,11 +1226,11 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                         TextButton(
                           onPressed: () async {
                             Navigator.pop(context);
-                            final success = await controller.placeBid(item.buyNowPrice!);
-                            if (success) {
+                            final errorMsg = await controller.placeBid(item.buyNowPrice!);
+                            if (errorMsg == null) {
                               SnackbarHelper.showSuccess('Congratulations! You purchased the vehicle.');
                             } else {
-                              SnackbarHelper.showError('Failed to process purchase. Please try again.');
+                              SnackbarHelper.showError(errorMsg);
                             }
                           },
                           child: const Text('Buy Now'),

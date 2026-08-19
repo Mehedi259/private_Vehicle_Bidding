@@ -54,16 +54,13 @@ class AuctionDetailsRepositoryImpl implements IAuctionDetailsRepository {
   }
 
   @override
-  Future<bool> placeBid(String sellPostId, double amount) async {
-    try {
-      final response = await ApiService.post('/api/bids/', {
-        'sell_post_id': sellPostId,
-        'amount': amount,
-      });
-      return response.statusCode == 201;
-    } catch (e) {
-      debugPrint('Failed to place bid: $e');
-      return false;
+  Future<void> placeBid(String sellPostId, double amount) async {
+    final response = await ApiService.post('/api/bids/', {
+      'sell_post_id': sellPostId,
+      'amount': amount,
+    });
+    if (response.statusCode != 201) {
+      throw Exception(response.body);
     }
   }
 }

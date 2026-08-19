@@ -4,5 +4,5 @@ abstract class IAuctionDetailsRepository {
   Future<AuctionItem?> getAuctionDetails(String id);
   Future<List<Map<String, dynamic>>> getComments(String sellPostId);
   Future<bool> postComment(String sellPostId, String text, {String? parentId});
-  Future<bool> placeBid(String sellPostId, double amount);
+  Future<void> placeBid(String sellPostId, double amount);
 }

@@ -80,7 +80,7 @@ class EditProfileView extends StatelessWidget {
                                 ),
                                 child: AppAvatar(
                                   imageUrl: avatarUrl,
-                                  fullName: 'Mohammad  Shobuj',
+                                  fullName: controller.nameController.text,
                                   radius: 42.r,
                                 ),
                               );
@@ -120,7 +120,7 @@ class EditProfileView extends StatelessWidget {
                       // 3. User Name & Email display labels
                       Center(
                         child: Text(
-                          'Mohammad Shobuj',
+                          controller.nameController.text,
                           style: GoogleFonts.spaceGrotesk(
                             color: const Color(0xFF323232),
                             fontSize: 16.sp,
@@ -131,7 +131,7 @@ class EditProfileView extends StatelessWidget {
                       SizedBox(height: 6.h),
                       Center(
                         child: Text(
-                          'mdshobuj204111@gmail.com',
+                          controller.emailController.text,
                           style: GoogleFonts.manrope(
                             color: const Color(0x7F323232),
                             fontSize: 14.sp,

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:get/get.dart';
 import '../../../core/interfaces/i_auction_details_repository.dart';
 import '../../../data/models/auction_item.dart';
@@ -52,11 +53,22 @@ class AuctionDetailsController extends GetxController {
     return success;
   }
 
-  Future<bool> placeBid(double amount) async {
-    final success = await _repository.placeBid(itemId, amount);
-    if (success) {
+  Future<String?> placeBid(double amount) async {
+    try {
+      await _repository.placeBid(itemId, amount);
       await fetchDetails(); // Refresh details to show new bid
+      return null; // Success
+    } catch (e) {
+      try {
+        final errorString = e.toString().replaceFirst('Exception: ', '');
+        final data = jsonDecode(errorString);
+        if (data is Map && data.containsKey('non_field_errors')) {
+          return data['non_field_errors'][0].toString();
+        }
+        return 'Failed to place bid. Please try again.';
+      } catch (_) {
+        return 'Failed to place bid. Please try again.';
+      }
     }
-    return success;
   }
 }
