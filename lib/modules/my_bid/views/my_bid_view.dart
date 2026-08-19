@@ -327,14 +327,19 @@ class MyBidView extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            '\$${item.userBid.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
-                            style: GoogleFonts.outfit(
-                              color: priceColor,
-                              fontSize: 13.sp,
-                              fontWeight: FontWeight.w700,
+                          Flexible(
+                            child: Text(
+                              '\$${item.userBid.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
+                              style: GoogleFonts.outfit(
+                                color: priceColor,
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          SizedBox(width: 4.w),
                           Row(
                             children: [
                               Icon(
@@ -535,7 +540,7 @@ class MyBidView extends StatelessWidget {
                             if (newBidAmount != null) {
                               try {
                                 final response = await ApiService.post('/api/bids/', {
-                                  'sell_post': item.id,
+                                  'sell_post_id': item.id,
                                   'amount': newBidAmount,
                                 });
                                 if (response.statusCode == 201) {
