@@ -29,6 +29,16 @@ class AddVehicleController extends GetxController {
   final exteriorColorController = TextEditingController(text: "White");
   final interiorColorController = TextEditingController(text: "Black");
   final titleStatusController = RxnString();
+  final payloadCapacityController = TextEditingController();
+  final towingCapacityController = TextEditingController();
+  final lengthController = TextEditingController();
+  final hullMaterialController = TextEditingController();
+  final engineHoursController = TextEditingController();
+  final totalTimeController = TextEditingController();
+  final engineTimeController = TextEditingController();
+  final registrationNumberController = TextEditingController();
+  final seatingCapacityController = TextEditingController();
+  final avionicsController = TextEditingController();
 
   // Form input controllers (Step 2)
   final RxList<String> selectedImagePaths = <String>[].obs;
@@ -86,10 +96,17 @@ class AddVehicleController extends GetxController {
     if (makeController.text.trim().isEmpty) return false;
     if (modelController.text.trim().isEmpty) return false;
     if (yearController.value == null || yearController.value!.isEmpty) return false;
-    if (mileageController.text.trim().isEmpty) return false;
-    if (vinController.text.trim().isEmpty) return false;
-    if (transmissionController.text.trim().isEmpty) return false;
-    if (fuelTypeController.text.trim().isEmpty) return false;
+    
+    final category = selectedCategory.value;
+    if (category != 'Boat' && category != 'Aircraft') {
+      if (mileageController.text.trim().isEmpty) return false;
+      if (vinController.text.trim().isEmpty) return false;
+      if (transmissionController.text.trim().isEmpty) return false;
+    }
+    if (category != 'Aircraft' && category != 'Boat') {
+        if (fuelTypeController.text.trim().isEmpty) return false;
+    }
+    
     if (titleStatusController.value == null || titleStatusController.value!.isEmpty) return false;
     return true;
   }
@@ -353,6 +370,18 @@ class AddVehicleController extends GetxController {
 
       if (trimController.text.trim().isNotEmpty) fields['trim'] = trimController.text.trim();
       
+      // Additional dynamic fields
+      if (payloadCapacityController.text.trim().isNotEmpty) fields['payload_capacity'] = payloadCapacityController.text.trim();
+      if (towingCapacityController.text.trim().isNotEmpty) fields['towing_capacity'] = towingCapacityController.text.trim();
+      if (lengthController.text.trim().isNotEmpty) fields['length'] = lengthController.text.trim();
+      if (hullMaterialController.text.trim().isNotEmpty) fields['hull_material'] = hullMaterialController.text.trim();
+      if (engineHoursController.text.trim().isNotEmpty) fields['engine_hours'] = engineHoursController.text.trim();
+      if (totalTimeController.text.trim().isNotEmpty) fields['total_time'] = totalTimeController.text.trim();
+      if (engineTimeController.text.trim().isNotEmpty) fields['engine_time'] = engineTimeController.text.trim();
+      if (registrationNumberController.text.trim().isNotEmpty) fields['registration_number'] = registrationNumberController.text.trim();
+      if (seatingCapacityController.text.trim().isNotEmpty) fields['seating_capacity'] = seatingCapacityController.text.trim();
+      if (avionicsController.text.trim().isNotEmpty) fields['avionics'] = avionicsController.text.trim();
+      
       if (featuresController.text.trim().isNotEmpty) {
         // Convert comma-separated features to JSON array string
         final featureList = featuresController.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
@@ -466,6 +495,16 @@ class AddVehicleController extends GetxController {
     stateController.dispose();
     cityController.dispose();
     zipCodeController.dispose();
+    payloadCapacityController.dispose();
+    towingCapacityController.dispose();
+    lengthController.dispose();
+    hullMaterialController.dispose();
+    engineHoursController.dispose();
+    totalTimeController.dispose();
+    engineTimeController.dispose();
+    registrationNumberController.dispose();
+    seatingCapacityController.dispose();
+    avionicsController.dispose();
     super.onClose();
   }
 }
