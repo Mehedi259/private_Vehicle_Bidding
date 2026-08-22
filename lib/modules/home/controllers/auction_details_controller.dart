@@ -13,6 +13,7 @@ class AuctionDetailsController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxList<Map<String, dynamic>> comments = <Map<String, dynamic>>[].obs;
   final RxBool isCommentsLoading = false.obs;
+  final RxInt selectedImageIndex = 0.obs;
 
   @override
   void onInit() {
@@ -26,6 +27,7 @@ class AuctionDetailsController extends GetxController {
     try {
       final item = await _repository.getAuctionDetails(itemId);
       auctionItem.value = item;
+      selectedImageIndex.value = 0;
     } catch (e) {
       Get.log("Error loading auction details: $e");
     } finally {

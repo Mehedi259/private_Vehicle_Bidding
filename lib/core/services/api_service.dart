@@ -6,7 +6,7 @@ import 'shared_prefs_service.dart';
 class ApiService {
   // Use 10.0.2.2 for Android Emulator to access host's localhost
   // Use 127.0.0.1 for iOS Simulator or Web
-  static const String baseUrl = 'http://13.50.173.212'; 
+  static const String baseUrl = 'http://13.50.173.212:8001';
   
   static Map<String, String> _headers(bool requireAuth) {
     final Map<String, String> headers = {

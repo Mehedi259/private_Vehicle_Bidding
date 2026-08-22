@@ -41,6 +41,7 @@ class AuctionItem {
   final String id;
   final String title;
   final String imageUrl;
+  final List<String> images;
   final double currentBid;
   final int bidsCount;
   final String category;
@@ -70,6 +71,7 @@ class AuctionItem {
     required this.id,
     required this.title,
     required this.imageUrl,
+    this.images = const [],
     required this.currentBid,
     required this.bidsCount,
     required this.category,
@@ -92,10 +94,12 @@ class AuctionItem {
 
   factory AuctionItem.fromJson(Map<String, dynamic> json) {
     String primaryImage = '';
+    List<String> allImages = [];
     if (json['images'] != null && (json['images'] as List).isNotEmpty) {
-      final images = json['images'] as List;
-      final primary = images.firstWhere((img) => img['is_primary'] == true, orElse: () => images.first);
+      final imagesList = json['images'] as List;
+      final primary = imagesList.firstWhere((img) => img['is_primary'] == true, orElse: () => imagesList.first);
       primaryImage = primary['image'] ?? '';
+      allImages = imagesList.map((img) => img['image']?.toString() ?? '').where((s) => s.isNotEmpty).toList();
     }
 
     final seller = json['seller_details'] ?? {};
@@ -118,6 +122,7 @@ class AuctionItem {
       id: json['id']?.toString() ?? '',
       title: '${json['year']} ${json['make']} ${json['model']}',
       imageUrl: primaryImage,
+      images: allImages,
       currentBid: double.tryParse(json['current_highest_bid']?.toString() ?? '0') ?? 0.0,
       bidsCount: json['total_bids'] ?? 0,
       category: (json['vehicle_type']?.toString() ?? 'cars').toLowerCase(),
@@ -143,6 +148,7 @@ class AuctionItem {
     String? id,
     String? title,
     String? imageUrl,
+    List<String>? images,
     double? currentBid,
     int? bidsCount,
     String? category,
@@ -161,6 +167,7 @@ class AuctionItem {
       id: id ?? this.id,
       title: title ?? this.title,
       imageUrl: imageUrl ?? this.imageUrl,
+      images: images ?? this.images,
       currentBid: currentBid ?? this.currentBid,
       bidsCount: bidsCount ?? this.bidsCount,
       category: category ?? this.category,

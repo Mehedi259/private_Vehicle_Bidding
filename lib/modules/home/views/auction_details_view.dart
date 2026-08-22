@@ -73,6 +73,7 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
         }
 
         final item = controller.auctionItem.value;
+        final selectedIndex = controller.selectedImageIndex.value;
 
         if (item == null) {
           return const Scaffold(
@@ -97,10 +98,16 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                         SizedBox(
                           width: double.infinity,
                           height: 269.h,
-                          child: item.imageUrl.startsWith('http')
-                              ? CachedNetworkImage(
-                                  imageUrl: item.imageUrl,
-                                  fit: BoxFit.cover,
+                          child: Builder(
+                            builder: (context) {
+                              final currentMainImage = (item.images.isNotEmpty && selectedIndex < item.images.length)
+                                  ? item.images[selectedIndex]
+                                  : item.imageUrl;
+                              
+                              return currentMainImage.startsWith('http')
+                                  ? CachedNetworkImage(
+                                      imageUrl: currentMainImage,
+                                      fit: BoxFit.cover,
                                   placeholder: (context, url) => Container(
                                     color: Colors.grey[200],
                                     child: Center(
@@ -115,19 +122,21 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                                     child: const Icon(Icons.broken_image, size: 40),
                                   ),
                                 )
-                              : (item.imageUrl.startsWith('/') || item.imageUrl.contains(':'))
+                              : (currentMainImage.startsWith('/') || currentMainImage.contains(':'))
                                   ? Image.file(
-                                      File(item.imageUrl),
+                                      File(currentMainImage),
                                       fit: BoxFit.cover,
                                       errorBuilder: (context, error, stackTrace) => Image.asset(
-                                        item.imageUrl,
+                                        currentMainImage,
                                         fit: BoxFit.cover,
                                       ),
                                     )
                                   : Image.asset(
-                                      item.imageUrl,
+                                      currentMainImage,
                                       fit: BoxFit.cover,
-                                    ),
+                                    );
+                            },
+                          ),
                         ),
                         // Safe Area Back Button
                         Positioned(
@@ -141,7 +150,7 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                           left: 0,
                           right: 0,
                           child: Text(
-                            '1/10 Photos',
+                            '${selectedIndex + 1}/${item.images.isNotEmpty ? item.images.length : 1} Photos',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.outfit(
                               color: Colors.white,
@@ -161,16 +170,25 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                         scrollDirection: Axis.horizontal,
                         physics: const BouncingScrollPhysics(),
                         padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        itemCount: 7,
+                        itemCount: item.images.isNotEmpty ? item.images.length : 1,
                         itemBuilder: (context, index) {
-                          return Container(
-                            width: 44.w,
-                            height: 44.h,
-                            margin: EdgeInsets.only(right: 8.w),
-                            decoration: ShapeDecoration(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
+                          final currentImageUrl = item.images.isNotEmpty ? item.images[index] : item.imageUrl;
+                          final isSelected = selectedIndex == index;
+                          return GestureDetector(
+                            onTap: () {
+                              controller.selectedImageIndex.value = index;
+                            },
+                            child: Container(
+                              width: 44.w,
+                              height: 44.h,
+                              margin: EdgeInsets.only(right: 8.w),
+                              decoration: ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  side: isSelected
+                                      ? BorderSide(color: const Color(0xFF1B4E9F), width: 2.w)
+                                      : BorderSide.none,
+                                ),
                               shadows: const [
                                 BoxShadow(
                                   color: Color(0x1A000000),
@@ -181,9 +199,9 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8.r),
-                              child: item.imageUrl.startsWith('http')
+                              child: currentImageUrl.startsWith('http')
                                   ? CachedNetworkImage(
-                                      imageUrl: item.imageUrl,
+                                      imageUrl: currentImageUrl,
                                       imageBuilder: (context, imageProvider) => Container(
                                         decoration: BoxDecoration(
                                           image: DecorationImage(
@@ -210,16 +228,16 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                                         child: const Icon(Icons.broken_image, size: 16),
                                       ),
                                     )
-                                  : (item.imageUrl.startsWith('/') || item.imageUrl.contains(':'))
+                                  : (currentImageUrl.startsWith('/') || currentImageUrl.contains(':'))
                                       ? Image.file(
-                                          File(item.imageUrl),
+                                          File(currentImageUrl),
                                           fit: BoxFit.cover,
                                           alignment: Alignment(
                                             (index - 3) * 0.3,
                                             0.0,
                                           ),
                                           errorBuilder: (context, error, stackTrace) => Image.asset(
-                                            item.imageUrl,
+                                            currentImageUrl,
                                             fit: BoxFit.cover,
                                             alignment: Alignment(
                                               (index - 3) * 0.3,
@@ -228,7 +246,7 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                                           ),
                                         )
                                       : Image.asset(
-                                          item.imageUrl,
+                                          currentImageUrl,
                                           fit: BoxFit.cover,
                                           alignment: Alignment(
                                             (index - 3) * 0.3,
@@ -236,8 +254,9 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                                           ),
                                         ),
                             ),
-                          );
-                        },
+                          ),
+                        );
+                      },
                       ),
                     ),
                     SizedBox(height: 16.h),
@@ -1167,6 +1186,8 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
     NumberFormat currencyFormat,
     AuctionDetailsController controller,
   ) {
+    final bool showBuyNow = item.buyNowPrice != null && item.currentBid < item.buyNowPrice!;
+
     return Container(
       width: double.infinity,
       height: 120.h,
@@ -1186,7 +1207,7 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    item.buyNowPrice != null
+                    showBuyNow
                         ? 'Buy without bidding at '
                         : 'Current Bid',
                     maxLines: 1,
@@ -1199,7 +1220,7 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                   ),
                   Text(
                     currencyFormat.format(
-                      item.buyNowPrice != null ? item.buyNowPrice! : item.currentBid,
+                      showBuyNow ? item.buyNowPrice! : item.currentBid,
                     ),
                     style: GoogleFonts.outfit(
                       color: Colors.white,
@@ -1210,7 +1231,7 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                 ],
               ),
             ),
-            if (item.buyNowPrice != null)
+            if (showBuyNow)
               GestureDetector(
                 onTap: () {
                   showDialog(
