@@ -29,16 +29,17 @@ class AddVehicleController extends GetxController {
   final exteriorColorController = TextEditingController(text: "White");
   final interiorColorController = TextEditingController(text: "Black");
   final titleStatusController = RxnString();
-  final payloadCapacityController = TextEditingController();
+  final cabTypeController = TextEditingController();
+  final bedLengthController = TextEditingController();
   final towingCapacityController = TextEditingController();
   final lengthController = TextEditingController();
   final hullMaterialController = TextEditingController();
+  final hullTypeController = TextEditingController();
   final engineHoursController = TextEditingController();
-  final totalTimeController = TextEditingController();
-  final engineTimeController = TextEditingController();
+  final flightHoursController = TextEditingController();
+  final aircraftTypeController = TextEditingController();
   final registrationNumberController = TextEditingController();
-  final seatingCapacityController = TextEditingController();
-  final avionicsController = TextEditingController();
+  final engineCcController = TextEditingController();
 
   // Form input controllers (Step 2)
   final RxList<String> selectedImagePaths = <String>[].obs;
@@ -371,16 +372,17 @@ class AddVehicleController extends GetxController {
       if (trimController.text.trim().isNotEmpty) fields['trim'] = trimController.text.trim();
       
       // Additional dynamic fields
-      if (payloadCapacityController.text.trim().isNotEmpty) fields['payload_capacity'] = payloadCapacityController.text.trim();
+      if (cabTypeController.text.trim().isNotEmpty) fields['cab_type'] = cabTypeController.text.trim();
+      if (bedLengthController.text.trim().isNotEmpty) fields['bed_length'] = bedLengthController.text.trim();
       if (towingCapacityController.text.trim().isNotEmpty) fields['towing_capacity'] = towingCapacityController.text.trim();
-      if (lengthController.text.trim().isNotEmpty) fields['length'] = lengthController.text.trim();
+      if (lengthController.text.trim().isNotEmpty) fields['length_ft'] = lengthController.text.trim();
       if (hullMaterialController.text.trim().isNotEmpty) fields['hull_material'] = hullMaterialController.text.trim();
+      if (hullTypeController.text.trim().isNotEmpty) fields['hull_type'] = hullTypeController.text.trim();
       if (engineHoursController.text.trim().isNotEmpty) fields['engine_hours'] = engineHoursController.text.trim();
-      if (totalTimeController.text.trim().isNotEmpty) fields['total_time'] = totalTimeController.text.trim();
-      if (engineTimeController.text.trim().isNotEmpty) fields['engine_time'] = engineTimeController.text.trim();
+      if (flightHoursController.text.trim().isNotEmpty) fields['flight_hours'] = flightHoursController.text.trim();
+      if (aircraftTypeController.text.trim().isNotEmpty) fields['aircraft_type'] = aircraftTypeController.text.trim();
       if (registrationNumberController.text.trim().isNotEmpty) fields['registration_number'] = registrationNumberController.text.trim();
-      if (seatingCapacityController.text.trim().isNotEmpty) fields['seating_capacity'] = seatingCapacityController.text.trim();
-      if (avionicsController.text.trim().isNotEmpty) fields['avionics'] = avionicsController.text.trim();
+      if (engineCcController.text.trim().isNotEmpty) fields['engine_cc'] = engineCcController.text.trim();
       
       if (featuresController.text.trim().isNotEmpty) {
         // Convert comma-separated features to JSON array string
@@ -495,16 +497,17 @@ class AddVehicleController extends GetxController {
     stateController.dispose();
     cityController.dispose();
     zipCodeController.dispose();
-    payloadCapacityController.dispose();
+    cabTypeController.dispose();
+    bedLengthController.dispose();
     towingCapacityController.dispose();
     lengthController.dispose();
     hullMaterialController.dispose();
+    hullTypeController.dispose();
     engineHoursController.dispose();
-    totalTimeController.dispose();
-    engineTimeController.dispose();
+    flightHoursController.dispose();
+    aircraftTypeController.dispose();
     registrationNumberController.dispose();
-    seatingCapacityController.dispose();
-    avionicsController.dispose();
+    engineCcController.dispose();
     super.onClose();
   }
 }

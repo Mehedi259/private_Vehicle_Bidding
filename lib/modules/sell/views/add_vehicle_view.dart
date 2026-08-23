@@ -249,6 +249,8 @@ class AddVehicleView extends StatelessWidget {
             return _buildBoatFields(controller);
           } else if (category == 'Aircraft') {
             return _buildAircraftFields(controller);
+          } else if (category == 'Other') {
+            return _buildOtherFields(controller);
           }
           return _buildCarFields(controller); // Default to Car
         }),
@@ -338,7 +340,7 @@ class AddVehicleView extends StatelessWidget {
           children: [
             Expanded(child: _buildLabelTextField(label: 'VIN Number', isRequired: true, hintText: 'write vin number', controller: controller.vinController)),
             SizedBox(width: 16.w),
-            Expanded(child: _buildLabelTextField(label: 'Engine (cc)', hintText: 'write engine', controller: controller.engineController)),
+            Expanded(child: _buildLabelTextField(label: 'Engine', hintText: 'write engine', controller: controller.engineController)),
           ],
         ),
         SizedBox(height: 16.h),
@@ -352,10 +354,14 @@ class AddVehicleView extends StatelessWidget {
         SizedBox(height: 16.h),
         Row(
           children: [
-            Expanded(child: _buildLabelTextField(label: 'Color', hintText: 'write color', controller: controller.exteriorColorController)),
+            Expanded(child: _buildLabelTextField(label: 'Engine (CC)', hintText: 'write CC', controller: controller.engineCcController)),
             SizedBox(width: 16.w),
-            Expanded(child: _buildLabelDropdown(label: 'Title Status', isRequired: true, hintText: 'Select status', value: controller.titleStatusController.value, items: const ['Clean', 'Salvage', 'Rebuilt', 'Parts Only'], onChanged: (val) => controller.titleStatusController.value = val)),
+            Expanded(child: _buildLabelTextField(label: 'Color', hintText: 'write color', controller: controller.exteriorColorController)),
           ],
+        ),
+        SizedBox(height: 16.h),
+        _buildLabelDropdown(
+          label: 'Title Status', isRequired: true, hintText: 'Select status', value: controller.titleStatusController.value, items: const ['Clean', 'Salvage', 'Rebuilt', 'Parts Only'], onChanged: (val) => controller.titleStatusController.value = val,
         ),
       ],
     );
@@ -406,14 +412,18 @@ class AddVehicleView extends StatelessWidget {
         SizedBox(height: 16.h),
         Row(
           children: [
-            Expanded(child: _buildLabelTextField(label: 'Payload Capacity', hintText: 'e.g. 2000 lbs', controller: controller.payloadCapacityController)),
+            Expanded(child: _buildLabelTextField(label: 'Cab Type', hintText: 'e.g. SuperCrew', controller: controller.cabTypeController)),
             SizedBox(width: 16.w),
-            Expanded(child: _buildLabelTextField(label: 'Towing Capacity', hintText: 'e.g. 10000 lbs', controller: controller.towingCapacityController)),
+            Expanded(child: _buildLabelTextField(label: 'Bed Length', hintText: 'e.g. 5.5 ft', controller: controller.bedLengthController)),
           ],
         ),
         SizedBox(height: 16.h),
-        _buildLabelDropdown(
-          label: 'Title Status', isRequired: true, hintText: 'Select status', value: controller.titleStatusController.value, items: const ['Clean', 'Salvage', 'Rebuilt', 'Parts Only'], onChanged: (val) => controller.titleStatusController.value = val,
+        Row(
+          children: [
+            Expanded(child: _buildLabelTextField(label: 'Towing Capacity', hintText: 'e.g. 8200', controller: controller.towingCapacityController)),
+            SizedBox(width: 16.w),
+            Expanded(child: _buildLabelDropdown(label: 'Title Status', isRequired: true, hintText: 'Select status', value: controller.titleStatusController.value, items: const ['Clean', 'Salvage', 'Rebuilt', 'Parts Only'], onChanged: (val) => controller.titleStatusController.value = val)),
+          ],
         ),
       ],
     );
@@ -434,7 +444,7 @@ class AddVehicleView extends StatelessWidget {
           children: [
             Expanded(child: _buildLabelDropdown(label: 'Year', isRequired: true, hintText: 'Select year', value: controller.yearController.value, items: List.generate(27, (i) => (2026 - i).toString()), onChanged: (val) => controller.yearController.value = val)),
             SizedBox(width: 16.w),
-            Expanded(child: _buildLabelTextField(label: 'Length', hintText: 'e.g. 24 ft', controller: controller.lengthController)),
+            Expanded(child: _buildLabelTextField(label: 'Length (ft)', hintText: 'e.g. 24.5', controller: controller.lengthController, keyboardType: TextInputType.number)),
           ],
         ),
         SizedBox(height: 16.h),
@@ -442,24 +452,28 @@ class AddVehicleView extends StatelessWidget {
           children: [
             Expanded(child: _buildLabelTextField(label: 'Hull Material', hintText: 'e.g. Fiberglass', controller: controller.hullMaterialController)),
             SizedBox(width: 16.w),
-            Expanded(child: _buildLabelTextField(label: 'Engine Type', hintText: 'write engine type', controller: controller.engineController)),
+            Expanded(child: _buildLabelTextField(label: 'Hull Type', hintText: 'e.g. Monohull', controller: controller.hullTypeController)),
           ],
         ),
         SizedBox(height: 16.h),
         Row(
           children: [
-            Expanded(child: _buildLabelTextField(label: 'Engine Hours', hintText: 'e.g. 300 hrs', controller: controller.engineHoursController, keyboardType: TextInputType.number)),
+            Expanded(child: _buildLabelTextField(label: 'Engine', hintText: 'write engine', controller: controller.engineController)),
             SizedBox(width: 16.w),
+            Expanded(child: _buildLabelTextField(label: 'Engine Hours', hintText: 'e.g. 300', controller: controller.engineHoursController, keyboardType: TextInputType.number)),
+          ],
+        ),
+        SizedBox(height: 16.h),
+        Row(
+          children: [
             Expanded(child: _buildLabelTextField(label: 'Fuel Type', isRequired: true, hintText: 'write fuel type', controller: controller.fuelTypeController)),
+            SizedBox(width: 16.w),
+            Expanded(child: _buildLabelTextField(label: 'Color', hintText: 'write color', controller: controller.exteriorColorController)),
           ],
         ),
         SizedBox(height: 16.h),
-        Row(
-          children: [
-            Expanded(child: _buildLabelTextField(label: 'Color', hintText: 'write color', controller: controller.exteriorColorController)),
-            SizedBox(width: 16.w),
-            Expanded(child: _buildLabelDropdown(label: 'Title Status', isRequired: false, hintText: 'Select status', value: controller.titleStatusController.value, items: const ['Clean', 'Salvage', 'Rebuilt', 'Parts Only'], onChanged: (val) => controller.titleStatusController.value = val)),
-          ],
+        _buildLabelDropdown(
+          label: 'Title Status', isRequired: true, hintText: 'Select status', value: controller.titleStatusController.value, items: const ['Clean', 'Salvage', 'Rebuilt', 'Parts Only'], onChanged: (val) => controller.titleStatusController.value = val,
         ),
       ],
     );
@@ -486,30 +500,48 @@ class AddVehicleView extends StatelessWidget {
         SizedBox(height: 16.h),
         Row(
           children: [
-            Expanded(child: _buildLabelTextField(label: 'Total Time (Airframe)', hintText: 'e.g. 2500 hrs', controller: controller.totalTimeController, keyboardType: TextInputType.number)),
+            Expanded(child: _buildLabelTextField(label: 'Aircraft Type', hintText: 'e.g. Single Engine', controller: controller.aircraftTypeController)),
             SizedBox(width: 16.w),
-            Expanded(child: _buildLabelTextField(label: 'Engine Time', hintText: 'e.g. 500 hrs', controller: controller.engineTimeController, keyboardType: TextInputType.number)),
+            Expanded(child: _buildLabelTextField(label: 'Flight Hours', hintText: 'e.g. 2500', controller: controller.flightHoursController, keyboardType: TextInputType.number)),
           ],
         ),
         SizedBox(height: 16.h),
         Row(
           children: [
-            Expanded(child: _buildLabelTextField(label: 'Seating Capacity', hintText: 'write capacity', controller: controller.seatingCapacityController, keyboardType: TextInputType.number)),
+            Expanded(child: _buildLabelTextField(label: 'Engine', hintText: 'write engine', controller: controller.engineController)),
             SizedBox(width: 16.w),
-            Expanded(child: _buildLabelTextField(label: 'Avionics', hintText: 'write avionics', controller: controller.avionicsController)),
+            Expanded(child: _buildLabelTextField(label: 'Fuel Type', isRequired: true, hintText: 'write fuel type', controller: controller.fuelTypeController)),
           ],
         ),
         SizedBox(height: 16.h),
         Row(
           children: [
-            Expanded(child: _buildLabelTextField(label: 'Exterior Color', hintText: 'write color', controller: controller.exteriorColorController)),
+            Expanded(child: _buildLabelTextField(label: 'Color', hintText: 'write color', controller: controller.exteriorColorController)),
             SizedBox(width: 16.w),
-            Expanded(child: _buildLabelTextField(label: 'Interior Color', hintText: 'write color', controller: controller.interiorColorController)),
+            Expanded(child: _buildLabelDropdown(label: 'Title Status', isRequired: true, hintText: 'Select status', value: controller.titleStatusController.value, items: const ['Clean', 'Salvage', 'Rebuilt', 'Parts Only'], onChanged: (val) => controller.titleStatusController.value = val)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOtherFields(AddVehicleController controller) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(child: _buildLabelTextField(label: 'Make', isRequired: true, hintText: 'write', controller: controller.makeController)),
+            SizedBox(width: 16.w),
+            Expanded(child: _buildLabelTextField(label: 'Model', isRequired: true, hintText: 'write', controller: controller.modelController)),
           ],
         ),
         SizedBox(height: 16.h),
-        _buildLabelDropdown(
-          label: 'Title Status', isRequired: false, hintText: 'Select status', value: controller.titleStatusController.value, items: const ['Clean', 'Salvage', 'Rebuilt', 'Parts Only'], onChanged: (val) => controller.titleStatusController.value = val,
+        Row(
+          children: [
+            Expanded(child: _buildLabelDropdown(label: 'Year', isRequired: true, hintText: 'Select year', value: controller.yearController.value, items: List.generate(27, (i) => (2026 - i).toString()), onChanged: (val) => controller.yearController.value = val)),
+            SizedBox(width: 16.w),
+            Expanded(child: _buildLabelDropdown(label: 'Title Status', isRequired: true, hintText: 'Select status', value: controller.titleStatusController.value, items: const ['Clean', 'Salvage', 'Rebuilt', 'Parts Only'], onChanged: (val) => controller.titleStatusController.value = val)),
+          ],
         ),
       ],
     );
