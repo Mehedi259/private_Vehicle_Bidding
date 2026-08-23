@@ -70,10 +70,13 @@ class FeaturedAuctionCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        errorWidget: (context, url, error) => Container(
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.broken_image),
-                        ),
+                        errorWidget: (context, url, error) {
+                          debugPrint("CachedNetworkImage error for $url: $error");
+                          return Container(
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.broken_image),
+                          );
+                        },
                       )
                     : (item.imageUrl.startsWith('/') || item.imageUrl.contains(':'))
                         ? Image.file(

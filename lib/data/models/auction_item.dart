@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import '../../core/services/api_service.dart';
+
 class BidLog {
   final String bidderName;
   final double amount;
@@ -93,13 +95,21 @@ class AuctionItem {
   });
 
   factory AuctionItem.fromJson(Map<String, dynamic> json) {
+    String getFullUrl(String path) {
+      if (path.isEmpty || path.startsWith('http')) return path;
+      if (!path.startsWith('/')) path = '/$path';
+      return '${ApiService.baseUrl}$path';
+    }
+
     String primaryImage = '';
     List<String> allImages = [];
     if (json['images'] != null && (json['images'] as List).isNotEmpty) {
       final imagesList = json['images'] as List;
       final primary = imagesList.firstWhere((img) => img['is_primary'] == true, orElse: () => imagesList.first);
-      primaryImage = primary['image'] ?? '';
-      allImages = imagesList.map((img) => img['image']?.toString() ?? '').where((s) => s.isNotEmpty).toList();
+      primaryImage = getFullUrl(primary['image']?.toString() ?? '');
+      allImages = imagesList.map((img) => getFullUrl(img['image']?.toString() ?? '')).where((s) => s.isNotEmpty).toList();
+    } else if (json['image_url'] != null) {
+      primaryImage = getFullUrl(json['image_url'].toString());
     }
 
     final seller = json['seller_details'] ?? {};
