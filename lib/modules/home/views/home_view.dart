@@ -9,6 +9,7 @@ import '../../../core/interfaces/i_home_repository.dart';
 import '../../../data/repositories/home_repository_impl.dart';
 import '../../../shared/widgets/place_bid_dialog.dart';
 import '../controllers/home_controller.dart';
+import '../../profile/controllers/profile_controller.dart';
 import '../../../data/models/category_model.dart';
 import '../../../shared/widgets/category_card.dart';
 import '../widgets/featured_auction_card.dart';
@@ -33,6 +34,7 @@ class _HomeViewState extends State<HomeView> {
       Get.lazyPut<IHomeRepository>(() => HomeRepositoryImpl());
     }
     controller = Get.put(HomeController(Get.find<IHomeRepository>()));
+    Get.put(ProfileController());
   }
 
   @override
@@ -63,14 +65,20 @@ class _HomeViewState extends State<HomeView> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Hello, Frank',
-                      style: GoogleFonts.outfit(
-                        color: const Color(0xFF2A2A2A),
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    Obx(() {
+                      final user = Get.find<ProfileController>().user.value;
+                      final firstName = (user.name != 'Loading...' && user.name.isNotEmpty)
+                          ? user.name.split(' ').first
+                          : '';
+                      return Text(
+                        firstName.isNotEmpty ? 'Hello, $firstName' : 'Hello',
+                        style: GoogleFonts.outfit(
+                          color: const Color(0xFF2A2A2A),
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    }),
                     SizedBox(height: 4.h),
                     Text(
                       'Find your next vehicle',

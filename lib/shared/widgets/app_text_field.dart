@@ -13,6 +13,7 @@ class AppTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final bool isRequired;
   final int maxLines;
+  final bool readOnly;
 
   const AppTextField({
     super.key,
@@ -26,6 +27,7 @@ class AppTextField extends StatefulWidget {
     this.validator,
     this.isRequired = false,
     this.maxLines = 1,
+    this.readOnly = false,
   });
 
   @override
@@ -79,8 +81,9 @@ class _AppTextFieldState extends State<AppTextField> {
           obscureText: _obscureText,
           validator: widget.validator,
           maxLines: widget.maxLines,
+          readOnly: widget.readOnly,
           style: GoogleFonts.poppins(
-            color: const Color(0xFF2D292E),
+            color: widget.readOnly ? const Color(0xFF9CA3AF) : const Color(0xFF2D292E),
             fontSize: 14.sp,
             fontWeight: FontWeight.w400,
           ),

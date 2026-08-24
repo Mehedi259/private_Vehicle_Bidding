@@ -171,6 +171,7 @@ class EditProfileView extends StatelessWidget {
                         labelText: 'Email Address',
                         controller: controller.emailController,
                         keyboardType: TextInputType.emailAddress,
+                        readOnly: true,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
                             return 'Please enter your email';
