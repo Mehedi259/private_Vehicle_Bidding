@@ -16,18 +16,18 @@ class AddVehicleController extends GetxController {
   final List<String> categories = ['Car', 'Motorcycle', 'Truck', 'Boat', 'Aircraft', 'Other'];
 
   // Form input controllers (Step 1)
-  final makeController = TextEditingController(text: "Audi");
-  final modelController = TextEditingController(text: "Q8");
-  final yearController = RxnString("2026");
-  final trimController = TextEditingController(text: "3.0 TFSI Premium Plus quattro");
-  final mileageController = TextEditingController(text: "5000");
-  final vinController = TextEditingController(text: "12345678901234567");
-  final transmissionController = TextEditingController(text: "Automatic");
-  final fuelTypeController = TextEditingController(text: "Petrol");
-  final driveTypeController = TextEditingController(text: "FWD");
-  final engineController = TextEditingController(text: "3.0L");
-  final exteriorColorController = TextEditingController(text: "White");
-  final interiorColorController = TextEditingController(text: "Black");
+  final makeController = TextEditingController();
+  final modelController = TextEditingController();
+  final yearController = RxnString();
+  final trimController = TextEditingController();
+  final mileageController = TextEditingController();
+  final vinController = TextEditingController();
+  final transmissionController = TextEditingController();
+  final fuelTypeController = TextEditingController();
+  final driveTypeController = TextEditingController();
+  final engineController = TextEditingController();
+  final exteriorColorController = TextEditingController();
+  final interiorColorController = TextEditingController();
   final titleStatusController = RxnString();
   final cabTypeController = TextEditingController();
   final bedLengthController = TextEditingController();
@@ -43,23 +43,23 @@ class AddVehicleController extends GetxController {
 
   // Form input controllers (Step 2)
   final RxList<String> selectedImagePaths = <String>[].obs;
-  final descriptionController = TextEditingController(text: "Audi Q8 is a luxury SUV known for its premium features and performance.");
-  final featuresController = TextEditingController(text: "Premium leather seats, Advanced infotainment system, Sunroof, Parking assist");
+  final descriptionController = TextEditingController();
+  final featuresController = TextEditingController();
 
   // Form input controllers (Step 3)
-  final startingBidController = TextEditingController(text: "18,000");
-  final reservePriceController = TextEditingController(text: "22,000");
-  final buyNowPriceController = TextEditingController(text: "26,000");
+  final startingBidController = TextEditingController();
+  final reservePriceController = TextEditingController();
+  final buyNowPriceController = TextEditingController();
   final RxString selectedDuration = '3 Days'.obs;
   final List<String> durations = ['3 Days', '5 Days', '7 Days', '10 Days', '14 Days'];
 
   // Form input controllers (Step 4)
   final RxString selectedDocType = 'Driving License'.obs;
   final RxnString selfieImagePath = RxnString();
-  final countryController = TextEditingController(text: "United Arab Emirates");
-  final stateController = TextEditingController(text: "Dubai");
-  final cityController = TextEditingController(text: "Al Aweer");
-  final zipCodeController = TextEditingController(text: "7025");
+  final countryController = TextEditingController();
+  final stateController = TextEditingController();
+  final cityController = TextEditingController();
+  final zipCodeController = TextEditingController();
 
   // Expanded summary indices (Step 5)
   final RxList<bool> expandedSummaries = <bool>[false, false, false, false].obs;
@@ -77,6 +77,49 @@ class AddVehicleController extends GetxController {
   }
 
   final ImagePicker _picker = ImagePicker();
+
+  Future<void> verifyVinAndPopulate() async {
+    final vin = vinController.text.trim();
+    if (vin.isEmpty) {
+      SnackbarHelper.showError('Please enter a VIN number first');
+      return;
+    }
+    
+    isVerifying.value = true;
+    try {
+      final response = await ApiService.post('/api/sell/posts/verify-vin/', {
+        'vin_number': vin,
+      });
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['is_valid'] == true && data['decoded_info'] != null) {
+          final info = data['decoded_info'];
+          makeController.text = info['make'] ?? '';
+          modelController.text = info['model'] ?? '';
+          yearController.value = info['year']?.toString();
+          trimController.text = info['trim'] ?? '';
+          transmissionController.text = info['transmission'] ?? '';
+          fuelTypeController.text = info['fuel_type'] ?? '';
+          driveTypeController.text = info['drive_type'] ?? '';
+          
+          if (info['engine_cylinders'] != null || info['displacement_l'] != null) {
+            engineController.text = '${info['displacement_l'] ?? ''}L ${info['engine_cylinders'] != null ? '${info['engine_cylinders']} Cyl' : ''}'.trim();
+          }
+          
+          SnackbarHelper.showSuccess('VIN details populated successfully');
+        } else {
+          SnackbarHelper.showError('Invalid VIN or no details found');
+        }
+      } else {
+        final error = jsonDecode(response.body);
+        SnackbarHelper.showError(error['error'] ?? 'VIN Verification Failed');
+      }
+    } catch (e) {
+      SnackbarHelper.showError('Network error during VIN verification');
+    } finally {
+      isVerifying.value = false;
+    }
+  }
 
   // Wizard transitions
   void setCategory(String category) {
