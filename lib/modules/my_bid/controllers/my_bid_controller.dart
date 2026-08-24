@@ -50,10 +50,28 @@ class MyBidController extends GetxController {
           final title = '${json['year']} ${json['make']} ${json['model']}';
           final myBid = double.tryParse(json['my_highest_bid']?.toString() ?? '0') ?? 0.0;
           final currentBid = double.tryParse(json['current_highest_bid']?.toString() ?? '0') ?? 0.0;
+          
+          String getFullUrl(String path) {
+            if (path.isEmpty || path.startsWith('http')) return path;
+            if (!path.startsWith('/')) path = '/$path';
+            return '${ApiService.baseUrl}$path';
+          }
+          
+          String primaryImage = 'assets/images/ford_f150.png';
+          if (json['image'] != null && json['image'].toString().isNotEmpty) {
+            primaryImage = getFullUrl(json['image'].toString());
+          } else if (json['primary_image'] != null && json['primary_image'].toString().isNotEmpty) {
+            primaryImage = getFullUrl(json['primary_image'].toString());
+          } else if (json['images'] != null && (json['images'] as List).isNotEmpty) {
+            final imagesList = json['images'] as List;
+            final primary = imagesList.firstWhere((img) => img['is_primary'] == true, orElse: () => imagesList.first);
+            primaryImage = getFullUrl(primary['image']?.toString() ?? '');
+          }
+
           return BidItem(
             id: json['sell_post_id'].toString(),
             title: title,
-            imagePath: 'assets/images/ford_f150.png', // Since API doesn't return image right now, use fallback or update backend later
+            imagePath: primaryImage,
             userBid: myBid,
             currentBid: currentBid,
             bidStatus: json['bid_status'] ?? 'outbid',
