@@ -8,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../../core/constants/app_routes.dart';
+import '../../../core/interfaces/i_home_repository.dart';
 import '../../../core/services/api_service.dart';
 import '../../../core/utils/api_error_parser.dart';
 import '../../../core/utils/snackbar_helper.dart';
