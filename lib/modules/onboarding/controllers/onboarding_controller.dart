@@ -63,4 +63,8 @@ class OnboardingController extends GetxController {
       context.go(AppRoutes.login);
     }
   }
+
+  void skipOnboarding(BuildContext context) {
+    context.go(AppRoutes.login);
+  }
 }

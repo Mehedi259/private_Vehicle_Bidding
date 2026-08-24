@@ -54,6 +54,7 @@ class OnboardingView extends StatelessWidget {
                   buttonText: controller.steps[controller.currentIndex.value].buttonText,
                   currentIndex: controller.currentIndex.value,
                   onNextTap: () => controller.nextPage(context),
+                  onSkip: () => controller.skipOnboarding(context),
                 ),
               ),
             ),
