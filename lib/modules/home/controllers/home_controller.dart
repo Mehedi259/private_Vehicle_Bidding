@@ -6,6 +6,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import '../../../core/constants/app_routes.dart';
 import '../../../core/interfaces/i_home_repository.dart';
 import '../../../core/services/api_service.dart';
+import '../../../core/utils/api_error_parser.dart';
 import '../../../data/models/auction_item.dart';
 import '../../../data/models/category_model.dart';
 import '../../../data/models/notification_model.dart';
@@ -134,7 +135,7 @@ class HomeController extends GetxController {
           SnackbarHelper.showError('A valid payment card is required to place a bid. Please go to Profile > Payment Methods to add one.');
         }
       } else {
-        SnackbarHelper.showError('Failed to place bid. Please try again.');
+        SnackbarHelper.showError(ApiErrorParser.parse(e, defaultMessage: 'Failed to place bid. Please try again.'));
       }
     }
   }

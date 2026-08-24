@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import '../../../core/interfaces/i_auction_details_repository.dart';
+import '../../../core/utils/api_error_parser.dart';
 import '../../../data/models/auction_item.dart';
 
 class AuctionDetailsController extends GetxController {
@@ -61,16 +62,7 @@ class AuctionDetailsController extends GetxController {
       await fetchDetails(); // Refresh details to show new bid
       return null; // Success
     } catch (e) {
-      try {
-        final errorString = e.toString().replaceFirst('Exception: ', '');
-        final data = jsonDecode(errorString);
-        if (data is Map && data.containsKey('non_field_errors')) {
-          return data['non_field_errors'][0].toString();
-        }
-        return 'Failed to place bid. Please try again.';
-      } catch (_) {
-        return 'Failed to place bid. Please try again.';
-      }
+      return ApiErrorParser.parse(e, defaultMessage: 'Failed to place bid. Please try again.');
     }
   }
 }

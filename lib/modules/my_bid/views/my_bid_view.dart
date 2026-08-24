@@ -8,7 +8,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../../core/constants/app_routes.dart';
-import '../../../core/interfaces/i_home_repository.dart';
+import '../../../core/services/api_service.dart';
+import '../../../core/utils/api_error_parser.dart';
 import '../../../core/utils/snackbar_helper.dart';
 import '../../../data/repositories/home_repository_impl.dart';
 import '../../../shared/widgets/place_bid_dialog.dart';
@@ -548,10 +549,10 @@ class MyBidView extends StatelessWidget {
                                   SnackbarHelper.showSuccess('Bid of ${currencyFormat.format(newBidAmount)} placed successfully!');
                                   controller.updateBid(item.id, newBidAmount);
                                 } else {
-                                  SnackbarHelper.showError('Failed to place bid.');
+                                  SnackbarHelper.showError(ApiErrorParser.parse(response.body, defaultMessage: 'Failed to place bid.'));
                                 }
                               } catch (e) {
-                                SnackbarHelper.showError('Failed to place bid.');
+                                SnackbarHelper.showError(ApiErrorParser.parse(e, defaultMessage: 'Failed to place bid.'));
                               }
                             }
                           });
