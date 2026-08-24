@@ -687,7 +687,7 @@ class AddVehicleView extends StatelessWidget {
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  'Minimum 10 photos required',
+                  'Minimum 15 photos required',
                   style: GoogleFonts.inter(
                     color: const Color(0xFF1B4E9F),
                     fontSize: 12.sp,

@@ -241,8 +241,8 @@ class AddVehicleController extends GetxController {
       }
     } else if (currentStep.value == 2) {
       if (validateStep2()) {
-        if (selectedImagePaths.length < 10) {
-          SnackbarHelper.showError('Please select at least 10 images');
+        if (selectedImagePaths.length < 15) {
+          SnackbarHelper.showError('Please select at least 15 images');
           return;
         }
         isVerifying.value = true;
@@ -325,8 +325,8 @@ class AddVehicleController extends GetxController {
   }
 
   Future<void> pickImage(ImageSource source) async {
-    if (selectedImagePaths.length >= 10) {
-      SnackbarHelper.showError('You can list a maximum of 10 photos.');
+    if (selectedImagePaths.length >= 20) {
+      SnackbarHelper.showError('You can list a maximum of 20 photos.');
       return;
     }
 
@@ -337,11 +337,11 @@ class AddVehicleController extends GetxController {
           maxWidth: 1080,
         );
         if (images.isNotEmpty) {
-          final remainingCount = 10 - selectedImagePaths.length;
+          final remainingCount = 20 - selectedImagePaths.length;
           final imagesToAdd = images.take(remainingCount);
           selectedImagePaths.addAll(imagesToAdd.map((img) => img.path));
           if (images.length > remainingCount) {
-            SnackbarHelper.showError('Only the first $remainingCount selected photos were added (max 10 allowed).');
+            SnackbarHelper.showError('Only the first $remainingCount selected photos were added (max 20 allowed).');
           }
         }
       } else {
