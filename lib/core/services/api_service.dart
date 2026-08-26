@@ -27,6 +27,10 @@ class ApiService {
 
   static final Map<String, String> _cookies = {};
 
+  static void clearCookies() {
+    _cookies.clear();
+  }
+
   static void _updateCookies(http.BaseResponse response) {
     String? rawCookie = response.headers['set-cookie'];
     if (rawCookie != null) {

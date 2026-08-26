@@ -5,11 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/app_routes.dart';
+import '../../../core/interfaces/i_auth_repository.dart';
+import '../../../core/services/shared_prefs_service.dart';
+import '../../../core/services/api_service.dart';
 import '../../../core/utils/snackbar_helper.dart';
 import '../../../data/models/user_model.dart';
 import 'dart:convert';
-import '../../../core/services/api_service.dart';
-import '../../../core/services/shared_prefs_service.dart';
 
 class ProfileController extends GetxController {
   // Observable user state
@@ -165,6 +166,8 @@ class ProfileController extends GetxController {
                       onPressed: () async {
                         Navigator.of(dialogContext).pop();
                         await SharedPrefsService.clearAuth();
+                        ApiService.clearCookies();
+                        Get.deleteAll(force: true); // Clear all memory state
                         if (context.mounted) {
                           context.go(AppRoutes.login);
                           SnackbarHelper.showSuccess('Logged out successfully!');
