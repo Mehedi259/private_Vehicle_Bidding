@@ -176,6 +176,11 @@ class AuctionItem {
     List<BidLog>? recentBids,
     double? buyNowPrice,
     bool? hasUserBid,
+    String? country,
+    String? state,
+    String? city,
+    String? zipCode,
+    DateTime? endTime,
   }) {
     return AuctionItem(
       id: id ?? this.id,
@@ -196,6 +201,11 @@ class AuctionItem {
       recentBids: recentBids ?? this.recentBids,
       buyNowPrice: buyNowPrice ?? this.buyNowPrice,
       hasUserBid: hasUserBid ?? this.hasUserBid,
+      country: country ?? this.country,
+      state: state ?? this.state,
+      city: city ?? this.city,
+      zipCode: zipCode ?? this.zipCode,
+      endTime: endTime ?? this.endTime,
     );
   }
 }

@@ -22,6 +22,8 @@ class HomeController extends GetxController {
   final RxList<CategoryModel> categories = <CategoryModel>[].obs;
   final RxList<NotificationModel> notifications = <NotificationModel>[].obs;
   final RxBool isLoading = false.obs;
+  
+  final Set<String> myBidItemIds = {};
 
   // ─── Filter & Search State ────────────────────────────────────────────────
   final RxString selectedCategory = 'all'.obs;
@@ -55,10 +57,28 @@ class HomeController extends GetxController {
         _homeRepository.getFeaturedAuctions(categoryId: selectedCategory.value),
         _homeRepository.getEndingSoonAuctions(categoryId: selectedCategory.value),
       ]);
-      featuredAuctions.assignAll(futures[0]);
-      endingSoonAuctions.assignAll(futures[1]);
+      
+      var featured = futures[0];
+      var ending = futures[1];
+      
+      featured = featured.map((item) {
+        final existing = featuredAuctions.firstWhereOrNull((e) => e.id == item.id);
+        final bool localHasBid = existing?.hasUserBid ?? false;
+        final bool serverHasBid = myBidItemIds.contains(item.id.trim());
+        return item.copyWith(hasUserBid: localHasBid || serverHasBid || item.hasUserBid);
+      }).toList();
+
+      ending = ending.map((item) {
+        final existing = endingSoonAuctions.firstWhereOrNull((e) => e.id == item.id);
+        final bool localHasBid = existing?.hasUserBid ?? false;
+        final bool serverHasBid = myBidItemIds.contains(item.id.trim());
+        return item.copyWith(hasUserBid: localHasBid || serverHasBid || item.hasUserBid);
+      }).toList();
+
+      featuredAuctions.assignAll(featured);
+      endingSoonAuctions.assignAll(ending);
     } catch (e) {
-      Get.log("Error filtering by category: $e");
+      Get.log("Error loading category data: $e");
     } finally {
       isLoading.value = false;
     }
@@ -96,6 +116,7 @@ class HomeController extends GetxController {
           hasUserBid: true,
         );
         featuredAuctions[index] = updatedItem;
+        featuredAuctions.refresh();
       }
       
       // Also update endingSoonAuctions if it's there
@@ -116,6 +137,7 @@ class HomeController extends GetxController {
           hasUserBid: true,
         );
         endingSoonAuctions[endingIndex] = updatedItem;
+        endingSoonAuctions.refresh();
       }
     } catch (e) {
       final errorMsg = e.toString();
@@ -173,10 +195,42 @@ class HomeController extends GetxController {
         _homeRepository.getFeaturedAuctions(categoryId: selectedCategory.value),
         _homeRepository.getEndingSoonAuctions(categoryId: selectedCategory.value),
         _homeRepository.getCategories(),
+        ApiService.get('/api/bids/my-bids/'), // Fetch user's bids
       ]);
 
-      featuredAuctions.assignAll(futures[0] as List<AuctionItem>);
-      endingSoonAuctions.assignAll(futures[1] as List<AuctionItem>);
+      final myBidsData = futures[3] as dynamic; // Can be HTTP response
+      myBidItemIds.clear();
+      try {
+        if (myBidsData.statusCode == 200) {
+          final data = jsonDecode(myBidsData.body);
+          final List<dynamic> bidsData = data['bids'] ?? [];
+          for (var b in bidsData) {
+            myBidItemIds.add(b['sell_post_id'].toString().trim());
+          }
+        }
+      } catch (e) {
+        Get.log('Error parsing my bids in home: $e');
+      }
+
+      var featured = futures[0] as List<AuctionItem>;
+      var ending = futures[1] as List<AuctionItem>;
+
+      featured = featured.map((item) {
+        final existing = featuredAuctions.firstWhereOrNull((e) => e.id == item.id);
+        final bool localHasBid = existing?.hasUserBid ?? false;
+        final bool serverHasBid = myBidItemIds.contains(item.id.trim());
+        return item.copyWith(hasUserBid: localHasBid || serverHasBid || item.hasUserBid);
+      }).toList();
+
+      ending = ending.map((item) {
+        final existing = endingSoonAuctions.firstWhereOrNull((e) => e.id == item.id);
+        final bool localHasBid = existing?.hasUserBid ?? false;
+        final bool serverHasBid = myBidItemIds.contains(item.id.trim());
+        return item.copyWith(hasUserBid: localHasBid || serverHasBid || item.hasUserBid);
+      }).toList();
+
+      featuredAuctions.assignAll(featured);
+      endingSoonAuctions.assignAll(ending);
       categories.assignAll(futures[2] as List<CategoryModel>);
     } catch (e) {
       Get.log("Error loading home data: $e");

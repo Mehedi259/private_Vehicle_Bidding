@@ -51,11 +51,14 @@ class _HomeViewState extends State<HomeView> {
             );
           }
 
-          return SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          return RefreshIndicator(
+            onRefresh: () => controller.fetchHomeData(),
+            color: const Color(0xFF1B4E9F),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // 1. Header (Logo & Notification bell)
                 const HomeHeader(),
@@ -290,6 +293,7 @@ class _HomeViewState extends State<HomeView> {
                 SizedBox(height: 100.h),
               ],
             ),
+          ),
           );
         }),
       ),

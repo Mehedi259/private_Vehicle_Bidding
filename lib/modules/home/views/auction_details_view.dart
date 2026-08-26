@@ -489,7 +489,7 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
           SizedBox(height: 12.h),
           // Place Bid inside card
           GestureDetector(
-            onTap: () {
+            onTap: item.hasUserBid ? null : () {
               PlaceBidDialog.show(context, item).then((bidAmount) async {
                 if (bidAmount != null) {
                   final errorMsg = await controller.placeBid(bidAmount);
@@ -507,13 +507,13 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
               height: 38.h,
               alignment: Alignment.center,
               decoration: ShapeDecoration(
-                color: const Color(0xFF1B4E9F),
+                color: item.hasUserBid ? const Color(0xFF9CA3AF) : const Color(0xFF1B4E9F),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.r),
                 ),
               ),
               child: Text(
-                'Place Bid',
+                item.hasUserBid ? 'Bid Placed' : 'Place Bid',
                 style: GoogleFonts.poppins(
                   color: Colors.white,
                   fontSize: 15.sp,

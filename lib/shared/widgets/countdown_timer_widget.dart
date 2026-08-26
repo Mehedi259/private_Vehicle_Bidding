@@ -23,6 +23,14 @@ class _CountdownTimerWidgetState extends State<CountdownTimerWidget> {
   }
 
   @override
+  void didUpdateWidget(CountdownTimerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.endTime != oldWidget.endTime) {
+      _updateTime();
+    }
+  }
+
+  @override
   void dispose() {
     _isDisposed = true;
     super.dispose();
