@@ -371,9 +371,7 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
                           _buildFeaturesSection(item),
                           SizedBox(height: 24.h),
 
-                          // 9. Independent Inspection Card
-                          _buildInspectionSection(context),
-                          SizedBox(height: 24.h),
+
 
                           // 10. Location Card
                           _buildLocationSection(item),
@@ -924,84 +922,7 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
     );
   }
 
-  // Independent Inspection Card builder
-  Widget _buildInspectionSection(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(16.r),
-      decoration: ShapeDecoration(
-        color: const Color(0xFFFDF2D3),
-        shape: RoundedRectangleBorder(
-          side: BorderSide(
-            width: 1.w,
-            color: const Color(0x222A2A2A),
-          ),
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        shadows: const [
-          BoxShadow(
-            color: Color(0x10000000),
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          )
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Independent Inspection:',
-            style: GoogleFonts.outfit(
-              color: const Color(0xFF2A2A2A),
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(height: 6.h),
-          Text(
-            'Get Vehicle inspected before purchase',
-            style: GoogleFonts.outfit(
-              color: const Color(0xCC2A2A2A),
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          SizedBox(height: 12.h),
-          GestureDetector(
-            onTap: () {
-              SnackbarHelper.showSuccess('Inspection request submitted successfully!');
-            },
-            child: Container(
-              width: double.infinity,
-              height: 38.h,
-              alignment: Alignment.center,
-              decoration: ShapeDecoration(
-                color: const Color(0xFFFAC249),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                shadows: const [
-                  BoxShadow(
-                    color: Color(0x10000000),
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  )
-                ],
-              ),
-              child: Text(
-                'Request Inspection',
-                style: GoogleFonts.poppins(
-                  color: const Color(0xFF2A2A2A),
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   // Location Section Builder
   Widget _buildLocationSection(AuctionItem item) {

@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../core/services/api_service.dart';
 import '../../data/models/auction_item.dart';
 import '../../core/utils/snackbar_helper.dart';
 
@@ -27,20 +29,54 @@ class _PlaceBidDialogState extends State<PlaceBidDialog> {
   final TextEditingController _customAmountController = TextEditingController();
   final FocusNode _customFocusNode = FocusNode();
 
-  late final double _currentBid;
-  late final List<double> _bidOptions;
+  late double _currentBid;
+  late List<double> _bidOptions;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _currentBid = widget.item.currentBid;
-    // Increments of 500, 1000, 1500, 2000
+    _updateBidOptions();
+    _fetchLatestBid();
+  }
+  
+  void _updateBidOptions() {
     _bidOptions = [
       _currentBid + 500,
       _currentBid + 1000,
       _currentBid + 1500,
       _currentBid + 2000,
     ];
+  }
+
+  Future<void> _fetchLatestBid() async {
+    try {
+      final response = await ApiService.get('/api/sell/posts/${widget.item.id}/', requireAuth: false);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final latestItem = AuctionItem.fromJson(data);
+        if (mounted) {
+          setState(() {
+            _currentBid = latestItem.currentBid;
+            _updateBidOptions();
+            _isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -108,7 +144,14 @@ class _PlaceBidDialogState extends State<PlaceBidDialog> {
           // Dialog Body
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
-            child: Column(
+            child: _isLoading 
+                ? SizedBox(
+                    height: 200.h,
+                    child: const Center(
+                      child: CircularProgressIndicator(color: Color(0xFF1B4E9F)),
+                    ),
+                  )
+                : Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
