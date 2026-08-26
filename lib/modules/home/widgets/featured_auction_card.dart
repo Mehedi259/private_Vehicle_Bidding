@@ -173,19 +173,19 @@ class FeaturedAuctionCard extends StatelessWidget {
                   ),
                   SizedBox(height: 6.h),
                   GestureDetector(
-                    onTap: onPlaceBidTap,
+                    onTap: item.hasUserBid ? null : onPlaceBidTap,
                     child: Container(
                       width: double.infinity,
                       height: 28.h,
                       alignment: Alignment.center,
                       decoration: ShapeDecoration(
-                        color: const Color(0xFF1B4E9F),
+                        color: item.hasUserBid ? const Color(0xFF9CA3AF) : const Color(0xFF1B4E9F),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                       ),
                       child: Text(
-                        'Place Bid',
+                        item.hasUserBid ? 'Bid Placed' : 'Place Bid',
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontSize: 12.sp,

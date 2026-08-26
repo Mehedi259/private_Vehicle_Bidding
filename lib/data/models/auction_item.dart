@@ -59,6 +59,7 @@ class AuctionItem {
   final List<String> features;
   final List<BidLog> recentBids;
   final double? buyNowPrice;
+  final bool hasUserBid;
 
   // Location fields
   final String country;
@@ -92,6 +93,7 @@ class AuctionItem {
     this.city = '',
     this.zipCode = '',
     this.endTime,
+    this.hasUserBid = false,
   });
 
   factory AuctionItem.fromJson(Map<String, dynamic> json) {
@@ -151,6 +153,7 @@ class AuctionItem {
       city: json['city']?.toString() ?? '',
       zipCode: json['zip_code']?.toString() ?? '',
       endTime: json['end_time'] != null ? DateTime.tryParse(json['end_time']) : null,
+      hasUserBid: json['has_user_bid'] == true || (json['bids'] as List<dynamic>?)?.any((b) => b['is_my_bid'] == true) == true,
     );
   }
 
@@ -172,6 +175,7 @@ class AuctionItem {
     List<String>? features,
     List<BidLog>? recentBids,
     double? buyNowPrice,
+    bool? hasUserBid,
   }) {
     return AuctionItem(
       id: id ?? this.id,
@@ -191,6 +195,7 @@ class AuctionItem {
       features: features ?? this.features,
       recentBids: recentBids ?? this.recentBids,
       buyNowPrice: buyNowPrice ?? this.buyNowPrice,
+      hasUserBid: hasUserBid ?? this.hasUserBid,
     );
   }
 }

@@ -93,6 +93,7 @@ class HomeController extends GetxController {
           currentBid: bidAmount,
           bidsCount: currentItem.bidsCount + 1,
           recentBids: updatedBids,
+          hasUserBid: true,
         );
         featuredAuctions[index] = updatedItem;
       }
@@ -112,6 +113,7 @@ class HomeController extends GetxController {
           currentBid: bidAmount,
           bidsCount: currentItem.bidsCount + 1,
           recentBids: updatedBids,
+          hasUserBid: true,
         );
         endingSoonAuctions[endingIndex] = updatedItem;
       }
