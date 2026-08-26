@@ -6,11 +6,14 @@ import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../../core/utils/snackbar_helper.dart';
 import '../../../shared/widgets/place_bid_dialog.dart';
 import '../../../core/interfaces/i_auction_details_repository.dart';
 import '../../../data/repositories/auction_details_repository_impl.dart';
+import '../../../core/constants/app_routes.dart';
 import '../controllers/auction_details_controller.dart';
 import '../../../data/models/auction_item.dart';
 import '../../../shared/widgets/app_back_button.dart';
@@ -1014,19 +1017,50 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
           ),
         ),
         SizedBox(height: 12.h),
-        Container(
-          width: double.infinity,
-          height: 181.h,
-          decoration: ShapeDecoration(
-            image: const DecorationImage(
-              image: NetworkImage("https://placehold.co/370x181/e2e8f0/1e293b?text=Vehicle+Location+Map"),
-              fit: BoxFit.cover,
+        Obx(() {
+          final location = controller.mapLocation.value;
+          return Container(
+            width: double.infinity,
+            height: 181.h,
+            clipBehavior: Clip.hardEdge,
+            decoration: ShapeDecoration(
+              color: Colors.grey.shade200,
+              image: location == null ? const DecorationImage(
+                image: NetworkImage("https://placehold.co/370x181/e2e8f0/1e293b.png?text=Loading+Map..."),
+                fit: BoxFit.cover,
+              ) : null,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r),
+              ),
             ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16.r),
-            ),
-          ),
-        ),
+            child: location != null ? FlutterMap(
+              options: MapOptions(
+                initialCenter: location,
+                initialZoom: 13.0,
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.private.vehiclebidding',
+                ),
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: location,
+                      width: 40,
+                      height: 40,
+                      child: const Icon(
+                        Icons.location_on,
+                        color: Colors.red,
+                        size: 40,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ) : null,
+          );
+        }),
         SizedBox(height: 12.h),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,

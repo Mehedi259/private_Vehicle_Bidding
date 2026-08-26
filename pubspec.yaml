@@ -39,6 +39,8 @@ dependencies:
   file_picker: ^11.0.2
   csv: ^8.0.0
   pagination_helper: ^1.0.4
+  flutter_map: ^8.3.1
+  latlong2: ^0.10.1
 
 
 dev_dependencies:
