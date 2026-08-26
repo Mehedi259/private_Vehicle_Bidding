@@ -195,22 +195,41 @@ class _HomeViewState extends State<HomeView> {
                       );
                     }
                     return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: items.map((item) {
-                        return FeaturedAuctionCard(
-                          item: item,
-                          onTap: () {
-                            context.push(AppRoutes.auctionDetailsPath(item.id));
-                          },
-                          onPlaceBidTap: () {
-                            PlaceBidDialog.show(context, item).then((bidAmount) {
-                              if (bidAmount != null) {
-                                controller.placeBid(item.id, bidAmount);
-                              }
-                            });
-                          },
-                        );
-                      }).toList(),
+                      children: [
+                        if (items.isNotEmpty)
+                          Expanded(
+                            child: FeaturedAuctionCard(
+                              item: items[0],
+                              onTap: () {
+                                context.push(AppRoutes.auctionDetailsPath(items[0].id));
+                              },
+                              onPlaceBidTap: () {
+                                PlaceBidDialog.show(context, items[0]).then((bidAmount) {
+                                  if (bidAmount != null) {
+                                    controller.placeBid(items[0].id, bidAmount);
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                        if (items.length > 1) SizedBox(width: 12.w),
+                        if (items.length > 1)
+                          Expanded(
+                            child: FeaturedAuctionCard(
+                              item: items[1],
+                              onTap: () {
+                                context.push(AppRoutes.auctionDetailsPath(items[1].id));
+                              },
+                              onPlaceBidTap: () {
+                                PlaceBidDialog.show(context, items[1]).then((bidAmount) {
+                                  if (bidAmount != null) {
+                                    controller.placeBid(items[1].id, bidAmount);
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                      ],
                     );
                   },
                 ),
@@ -269,22 +288,41 @@ class _HomeViewState extends State<HomeView> {
                       );
                     }
                     return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: items.map((item) {
-                        return FeaturedAuctionCard(
-                          item: item,
-                          onTap: () {
-                            context.push(AppRoutes.auctionDetailsPath(item.id));
-                          },
-                          onPlaceBidTap: () {
-                            PlaceBidDialog.show(context, item).then((bidAmount) {
-                              if (bidAmount != null) {
-                                controller.placeBid(item.id, bidAmount);
-                              }
-                            });
-                          },
-                        );
-                      }).toList(),
+                      children: [
+                        if (items.isNotEmpty)
+                          Expanded(
+                            child: FeaturedAuctionCard(
+                              item: items[0],
+                              onTap: () {
+                                context.push(AppRoutes.auctionDetailsPath(items[0].id));
+                              },
+                              onPlaceBidTap: () {
+                                PlaceBidDialog.show(context, items[0]).then((bidAmount) {
+                                  if (bidAmount != null) {
+                                    controller.placeBid(items[0].id, bidAmount);
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                        if (items.length > 1) SizedBox(width: 12.w),
+                        if (items.length > 1)
+                          Expanded(
+                            child: FeaturedAuctionCard(
+                              item: items[1],
+                              onTap: () {
+                                context.push(AppRoutes.auctionDetailsPath(items[1].id));
+                              },
+                              onPlaceBidTap: () {
+                                PlaceBidDialog.show(context, items[1]).then((bidAmount) {
+                                  if (bidAmount != null) {
+                                    controller.placeBid(items[1].id, bidAmount);
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                      ],
                     );
                   },
                 ),

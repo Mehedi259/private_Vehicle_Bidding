@@ -173,7 +173,7 @@ class _FeaturedAuctionsViewState extends State<FeaturedAuctionsView> {
                           crossAxisCount: 2,
                           crossAxisSpacing: 16.w,
                           mainAxisSpacing: 16.h,
-                          childAspectRatio: 176 / 248,
+                          mainAxisExtent: 260.h,
                         ),
                         itemCount: items.length,
                         itemBuilder: (context, index) {

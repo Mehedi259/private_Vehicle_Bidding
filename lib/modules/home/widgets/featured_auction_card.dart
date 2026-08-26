@@ -27,7 +27,7 @@ class FeaturedAuctionCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 176.w,
+        width: double.infinity,
         decoration: ShapeDecoration(
           color: Colors.white,
           shape: RoundedRectangleBorder(
@@ -50,49 +50,86 @@ class FeaturedAuctionCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Top Image
-            ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16.r),
-                topRight: Radius.circular(16.r),
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 96.h,
-                child: item.imageUrl.startsWith('http')
-                    ? CachedNetworkImage(
-                        imageUrl: item.imageUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          color: Colors.grey[200],
-                          child: Center(
-                            child: LoadingAnimationWidget.threeArchedCircle(
-                              color: const Color(0xFF1B4E9F),
-                              size: 24.r,
-                            ),
-                          ),
-                        ),
-                        errorWidget: (context, url, error) {
-                          debugPrint("CachedNetworkImage error for $url: $error");
-                          return Container(
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.broken_image),
-                          );
-                        },
-                      )
-                    : (item.imageUrl.startsWith('/') || item.imageUrl.contains(':'))
-                        ? Image.file(
-                            File(item.imageUrl),
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16.r),
+                    topRight: Radius.circular(16.r),
+                  ),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 96.h,
+                    child: item.imageUrl.startsWith('http')
+                        ? CachedNetworkImage(
+                            imageUrl: item.imageUrl,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Image.asset(
-                              item.imageUrl,
-                              fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              color: Colors.grey[200],
+                              child: Center(
+                                child: LoadingAnimationWidget.threeArchedCircle(
+                                  color: const Color(0xFF1B4E9F),
+                                  size: 24.r,
+                                ),
+                              ),
                             ),
+                            errorWidget: (context, url, error) {
+                              debugPrint("CachedNetworkImage error for $url: $error");
+                              return Container(
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.broken_image),
+                              );
+                            },
                           )
-                        : Image.asset(
-                            item.imageUrl,
-                            fit: BoxFit.cover,
+                        : (item.imageUrl.startsWith('/') || item.imageUrl.contains(':'))
+                            ? Image.file(
+                                File(item.imageUrl),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) => Image.asset(
+                                  item.imageUrl,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : Image.asset(
+                                item.imageUrl,
+                                fit: BoxFit.cover,
+                              ),
+                  ),
+                ),
+                if (item.vinVerified || item.verifiedSeller)
+                  Positioned(
+                    top: 8.h,
+                    right: 8.w,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+                      decoration: ShapeDecoration(
+                        color: const Color(0xFF05BE27).withValues(alpha: 0.9),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4.r),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.verified,
+                            color: Colors.white,
+                            size: 10.sp,
                           ),
-              ),
+                          SizedBox(width: 2.w),
+                          Text(
+                            'Verified',
+                            style: GoogleFonts.outfit(
+                              color: Colors.white,
+                              fontSize: 9.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
             ),
             // Content Area
             Padding(
@@ -168,7 +205,7 @@ class FeaturedAuctionCard extends StatelessWidget {
                     children: [
                       Icon(Icons.timer_outlined, size: 14.sp, color: const Color(0xFFF86247)),
                       SizedBox(width: 4.w),
-                      CountdownTimerWidget(endTime: item.endTime),
+                      Expanded(child: CountdownTimerWidget(endTime: item.endTime)),
                     ],
                   ),
                   SizedBox(height: 6.h),
