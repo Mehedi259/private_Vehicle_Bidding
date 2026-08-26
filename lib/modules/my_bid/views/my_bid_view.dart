@@ -231,9 +231,11 @@ class MyBidView extends StatelessWidget {
       buttonTextColor = const Color(0xFF05BE28);
     }
 
-    return Container(
-      decoration: ShapeDecoration(
-        color: Colors.white,
+    return GestureDetector(
+      onTap: () => context.push(AppRoutes.auctionDetailsPath(item.id)),
+      child: Container(
+        decoration: ShapeDecoration(
+          color: Colors.white,
         shape: RoundedRectangleBorder(
           side: BorderSide(
             width: 1.w,
@@ -594,6 +596,7 @@ class MyBidView extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

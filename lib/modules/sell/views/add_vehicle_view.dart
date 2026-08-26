@@ -26,10 +26,11 @@ class AddVehicleView extends StatelessWidget {
       dispose: (state) => Get.delete<AddVehicleController>(),
       builder: (controller) {
         return Scaffold(
-          resizeToAvoidBottomInset: false,
           backgroundColor: Colors.white,
-          body: SafeArea(
-            child: Column(
+          body: GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: SafeArea(
+              child: Column(
               children: [
                 // 1. Centered Header with Circular Back Button
                 Padding(
@@ -56,16 +57,23 @@ class AddVehicleView extends StatelessWidget {
                 ),
                 SizedBox(height: 12.h),
 
-                // 2. Step Progress Indicator
-                Obx(() => _buildStepProgressIndicator(controller)),
-                SizedBox(height: 24.h),
-
-                // 3. Step Content (Flexible/Scrollable)
+                // Scrollable Area (Step indicator + Form)
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Obx(() => _buildCurrentStepView(controller, context)),
+                    child: Column(
+                      children: [
+                        // 2. Step Progress Indicator
+                        Obx(() => _buildStepProgressIndicator(controller)),
+                        SizedBox(height: 24.h),
+
+                        // 3. Step Content
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          child: Obx(() => _buildCurrentStepView(controller, context)),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -73,6 +81,7 @@ class AddVehicleView extends StatelessWidget {
                 Obx(() => _buildBottomActionBar(controller, context)),
               ],
             ),
+          ),
           ),
         );
       },

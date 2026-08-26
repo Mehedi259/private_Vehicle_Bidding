@@ -5,6 +5,8 @@ class UserModel {
   final String? avatarUrl;
   final String? dob;
   final String? gender;
+  final String? phoneNumber;
+  final String? address;
 
   const UserModel({
     required this.id,
@@ -13,6 +15,8 @@ class UserModel {
     this.avatarUrl,
     this.dob,
     this.gender,
+    this.phoneNumber,
+    this.address,
   });
 
   UserModel copyWith({
@@ -22,6 +26,8 @@ class UserModel {
     String? avatarUrl,
     String? dob,
     String? gender,
+    String? phoneNumber,
+    String? address,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -30,6 +36,8 @@ class UserModel {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       dob: dob ?? this.dob,
       gender: gender ?? this.gender,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      address: address ?? this.address,
     );
   }
 
@@ -41,6 +49,8 @@ class UserModel {
       'avatarUrl': avatarUrl,
       'dob': dob,
       'gender': gender,
+      'phone_number': phoneNumber,
+      'address': address,
     };
   }
 
@@ -52,6 +62,8 @@ class UserModel {
       avatarUrl: json['avatarUrl'],
       dob: json['dob'],
       gender: json['gender'],
+      phoneNumber: json['phone_number'],
+      address: json['address'],
     );
   }
 }

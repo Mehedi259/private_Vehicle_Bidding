@@ -14,10 +14,14 @@ class EditProfileController extends GetxController {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   late final TextEditingController nameController;
   late final TextEditingController emailController;
+  late final TextEditingController phoneController;
+  late final TextEditingController addressController;
 
   // Focus nodes
   final FocusNode nameFocusNode = FocusNode();
   final FocusNode emailFocusNode = FocusNode();
+  final FocusNode phoneFocusNode = FocusNode();
+  final FocusNode addressFocusNode = FocusNode();
 
   // Observables
   final Rx<DateTime?> dob = Rx<DateTime?>(null);
@@ -38,6 +42,8 @@ class EditProfileController extends GetxController {
     // Initialize text controllers
     nameController = TextEditingController(text: currentUser.name);
     emailController = TextEditingController(text: currentUser.email);
+    phoneController = TextEditingController(text: currentUser.phoneNumber ?? '');
+    addressController = TextEditingController(text: currentUser.address ?? '');
 
     // Initialize DOB
     if (currentUser.dob != null) {
@@ -72,8 +78,12 @@ class EditProfileController extends GetxController {
   void onClose() {
     nameController.dispose();
     emailController.dispose();
+    phoneController.dispose();
+    addressController.dispose();
     nameFocusNode.dispose();
     emailFocusNode.dispose();
+    phoneFocusNode.dispose();
+    addressFocusNode.dispose();
     super.onClose();
   }
 
@@ -139,6 +149,8 @@ class EditProfileController extends GetxController {
       };
       if (dobStr != null) fields['dob'] = dobStr;
       if (gender.value.isNotEmpty) fields['gender'] = gender.value;
+      if (phoneController.text.trim().isNotEmpty) fields['phone_number'] = phoneController.text.trim();
+      if (addressController.text.trim().isNotEmpty) fields['address'] = addressController.text.trim();
 
       List<http.MultipartFile> files = [];
       if (selectedImagePath.value.isNotEmpty) {

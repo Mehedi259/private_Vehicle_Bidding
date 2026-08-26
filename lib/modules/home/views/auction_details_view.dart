@@ -14,6 +14,7 @@ import '../../../data/repositories/auction_details_repository_impl.dart';
 import '../controllers/auction_details_controller.dart';
 import '../../../data/models/auction_item.dart';
 import '../../../shared/widgets/app_back_button.dart';
+import '../../../shared/widgets/countdown_timer_widget.dart';
 
 class AuctionDetailsView extends StatefulWidget {
   final String itemId;
@@ -1286,71 +1287,6 @@ class _AuctionDetailsViewState extends State<AuctionDetailsView> {
               const SizedBox.shrink(),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class CountdownTimerWidget extends StatefulWidget {
-  final DateTime? endTime;
-
-  const CountdownTimerWidget({super.key, this.endTime});
-
-  @override
-  State<CountdownTimerWidget> createState() => _CountdownTimerWidgetState();
-}
-
-class _CountdownTimerWidgetState extends State<CountdownTimerWidget> {
-  late String _timeLeft;
-  // Use a Future for delayed updates to avoid memory leaks with Timer
-  bool _isDisposed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _updateTime();
-  }
-
-  @override
-  void dispose() {
-    _isDisposed = true;
-    super.dispose();
-  }
-
-  void _updateTime() {
-    if (_isDisposed) return;
-    
-    setState(() {
-      if (widget.endTime == null) {
-        _timeLeft = 'Time not set';
-      } else {
-        final now = DateTime.now();
-        if (now.isAfter(widget.endTime!)) {
-          _timeLeft = 'Auction Ended';
-        } else {
-          final diff = widget.endTime!.difference(now);
-          final totalHours = diff.inHours.toString().padLeft(2, '0');
-          final mins = diff.inMinutes.remainder(60).toString().padLeft(2, '0');
-          final secs = diff.inSeconds.remainder(60).toString().padLeft(2, '0');
-          
-          _timeLeft = '${totalHours}h ${mins}m ${secs}s Left';
-        }
-      }
-    });
-
-    if (widget.endTime != null && widget.endTime!.isAfter(DateTime.now())) {
-      Future.delayed(const Duration(seconds: 1), _updateTime);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      _timeLeft,
-      style: GoogleFonts.poppins(
-        color: const Color(0xFFF86247),
-        fontSize: 14.sp,
-        fontWeight: FontWeight.w400,
       ),
     );
   }

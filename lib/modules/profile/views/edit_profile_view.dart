@@ -184,6 +184,34 @@ class EditProfileView extends StatelessWidget {
                       ),
                       SizedBox(height: 20.h),
 
+                      // Phone Number
+                      AppTextField(
+                        labelText: 'Phone Number',
+                        controller: controller.phoneController,
+                        keyboardType: TextInputType.phone,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your phone number';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20.h),
+
+                      // Address
+                      AppTextField(
+                        labelText: 'Address',
+                        controller: controller.addressController,
+                        keyboardType: TextInputType.streetAddress,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your address';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20.h),
+
                       // Date of Birth
                       Obx(
                         () => AppDatePickerField(

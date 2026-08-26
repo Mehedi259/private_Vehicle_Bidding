@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../../data/models/auction_item.dart';
+import '../../../shared/widgets/countdown_timer_widget.dart';
 
 class FeaturedAuctionCard extends StatelessWidget {
   final AuctionItem item;
@@ -56,7 +57,7 @@ class FeaturedAuctionCard extends StatelessWidget {
               ),
               child: SizedBox(
                 width: double.infinity,
-                height: 112.h,
+                height: 96.h,
                 child: item.imageUrl.startsWith('http')
                     ? CachedNetworkImage(
                         imageUrl: item.imageUrl,
@@ -95,7 +96,7 @@ class FeaturedAuctionCard extends StatelessWidget {
             ),
             // Content Area
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 10.h),
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -109,7 +110,7 @@ class FeaturedAuctionCard extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 6.h),
+                  SizedBox(height: 4.h),
                   Text(
                     'Current Bid',
                     style: GoogleFonts.outfit(
@@ -118,7 +119,7 @@ class FeaturedAuctionCard extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  SizedBox(height: 4.h),
+                  SizedBox(height: 2.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -162,7 +163,15 @@ class FeaturedAuctionCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10.h),
+                  SizedBox(height: 4.h),
+                  Row(
+                    children: [
+                      Icon(Icons.timer_outlined, size: 14.sp, color: const Color(0xFFF86247)),
+                      SizedBox(width: 4.w),
+                      CountdownTimerWidget(endTime: item.endTime),
+                    ],
+                  ),
+                  SizedBox(height: 6.h),
                   GestureDetector(
                     onTap: onPlaceBidTap,
                     child: Container(
